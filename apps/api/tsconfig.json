@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "rootDir": "../..",
+    "outDir": "dist",
+    "removeComments": false,
+    "noEmit": false,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@jobpilot/config": ["../../packages/config/src/index.ts"],
+      "@jobpilot/database": ["../../packages/database/src/index.ts"],
+      "@jobpilot/validation": ["../../packages/validation/src/index.ts"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "../../packages/config/src/**/*",
+    "../../packages/database/src/**/*",
+    "../../packages/validation/src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

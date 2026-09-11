@@ -1,0 +1,759 @@
+Tu es le lead developer et architecte logiciel de ce projet.
+
+Je veux que tu construises une application SaaS complète permettant aux utilisateurs de gérer leur recherche d'emploi et, à terme, de **postuler à des offres en ligne avec un minimum d'intervention manuelle**, grâce à un agent IA et à une extension navigateur.
+
+Le nom provisoire du projet est **JobPilot**.
+
+IMPORTANT :
+
+* Ne génère pas uniquement une maquette frontend.
+* Je veux une véritable architecture full-stack évolutive.
+* Travaille étape par étape.
+* Avant de coder une fonctionnalité importante, analyse l'architecture existante.
+* Ne crée pas de fichiers inutiles.
+* Ne duplique pas la logique.
+* Utilise TypeScript partout où c'est pertinent.
+* Le code doit être propre, modulaire, maintenable et sécurisé.
+* Ne mets jamais de secrets directement dans le code.
+* Utilise des variables d'environnement.
+* Après chaque étape importante, vérifie que le projet compile et que les tests pertinents passent.
+* Si une décision technique est nécessaire, choisis l'option la plus simple, robuste et évolutive plutôt que de surarchitecturer.
+
+# 1. OBJECTIF DU PRODUIT
+
+L'application doit permettre à un candidat de :
+
+1. Créer son profil professionnel.
+2. Importer son CV.
+3. Renseigner ses expériences, formations et compétences.
+4. Définir ses préférences de recherche d'emploi.
+5. Ajouter ou détecter une offre d'emploi.
+6. Analyser automatiquement l'offre avec un LLM.
+7. Calculer la compatibilité entre le candidat et l'offre.
+8. Générer une lettre de motivation adaptée.
+9. Identifier les questions du formulaire de candidature.
+10. Préparer automatiquement les réponses à partir du profil du candidat.
+11. Préremplir les formulaires de candidature grâce à une extension Chrome.
+12. Demander une validation à l'utilisateur avant toute action sensible.
+13. Soumettre la candidature lorsque cela est techniquement possible.
+14. Enregistrer automatiquement la candidature dans un tableau de suivi.
+15. Afficher l'historique et le statut de chaque candidature.
+
+L'objectif à long terme est d'avoir un système capable de fonctionner avec différentes plateformes grâce à une architecture de connecteurs/adapters.
+
+IMPORTANT :
+Ne prétends jamais pouvoir automatiser 100 % des plateformes.
+Certaines plateformes peuvent utiliser CAPTCHA, 2FA, protections anti-bot ou des interfaces incompatibles.
+Dans ces situations, le système doit passer en mode `WAITING_USER` et demander une intervention humaine.
+
+# 2. STACK TECHNIQUE
+
+Utilise cette stack par défaut :
+
+Frontend :
+
+* Next.js
+* TypeScript
+* App Router
+* Tailwind CSS
+* composants UI propres et accessibles
+
+Backend :
+
+* Node.js
+* TypeScript
+* API REST
+* architecture modulaire
+
+Base de données :
+
+* PostgreSQL
+* Prisma ORM
+
+Infrastructure :
+
+* Redis pour les tâches asynchrones et files d'attente
+* stockage S3-compatible pour les CV/documents
+
+IA :
+
+* architecture d'abstraction AIProvider
+* premier provider : Ollama
+* possibilité future d'ajouter OpenAI, Anthropic, Google ou d'autres providers
+* ne couple jamais toute l'application directement à Ollama
+
+Extension :
+
+* Chrome Extension
+* Manifest V3
+* TypeScript
+
+Tests :
+
+* Vitest ou Jest pour le backend
+* tests des fonctions critiques
+* tests de validation des données
+* tests de l'API
+
+# 3. ARCHITECTURE DU MONOREPO
+
+Utilise une architecture monorepo claire.
+
+Proposition :
+
+/
+├── apps/
+│   ├── web/
+│   ├── api/
+│   └── extension/
+│
+├── packages/
+│   ├── database/
+│   ├── ai/
+│   ├── shared/
+│   ├── validation/
+│   └── config/
+│
+├── docs/
+├── scripts/
+├── .env.example
+├── package.json
+└── README.md
+
+Tu peux modifier cette structure si une meilleure architecture est nécessaire, mais documente la raison.
+
+# 4. MODÈLE DE DONNÉES
+
+Prépare une base PostgreSQL avec Prisma.
+
+Les principales entités doivent inclure :
+
+User
+Profile
+Experience
+Education
+Skill
+Resume
+CoverLetter
+JobPreference
+Job
+Application
+ApplicationAnswer
+AutomationRule
+AutomationLog
+Notification
+
+Relations principales :
+
+User
+├── Profile
+├── Experiences
+├── Educations
+├── Skills
+├── Resumes
+├── CoverLetters
+├── JobPreferences
+└── Applications
+
+Application doit notamment pouvoir conserver :
+
+* jobId
+* userId
+* platform
+* resumeId
+* coverLetterId
+* status
+* answers
+* compatibilityScore
+* automationLog
+* submittedAt
+* createdAt
+* updatedAt
+
+Les statuts d'une candidature doivent pouvoir inclure :
+
+DRAFT
+PENDING
+PROCESSING
+WAITING_USER
+SUBMITTED
+FAILED
+REJECTED
+INTERVIEW
+ACCEPTED
+
+Utilise des enums lorsque c'est pertinent.
+
+# 5. AUTHENTIFICATION
+
+Prépare une authentification sécurisée.
+
+Le système doit permettre :
+
+* inscription
+* connexion
+* déconnexion
+* session persistante
+* protection des routes privées
+* hash sécurisé des mots de passe si une authentification par mot de passe est utilisée
+* validation stricte des données
+
+Ne stocke jamais les mots de passe en clair.
+
+# 6. PROFIL UTILISATEUR
+
+Créer une interface permettant à l'utilisateur de renseigner :
+
+Informations personnelles :
+
+* prénom
+* nom
+* email
+* téléphone
+* ville
+* pays
+* adresse éventuellement
+
+Profil professionnel :
+
+* titre
+* résumé professionnel
+* années d'expérience
+* disponibilité
+* compétences
+
+Expériences :
+
+* entreprise
+* poste
+* date de début
+* date de fin
+* description
+* réalisations
+
+Formation :
+
+* établissement
+* diplôme
+* domaine
+* dates
+
+Compétences :
+
+* nom
+* niveau
+
+Préférences :
+
+* métiers recherchés
+* localisation
+* travail à distance
+* salaire minimum
+* types de contrat
+* secteurs
+
+# 7. GESTION DES CV
+
+L'utilisateur doit pouvoir :
+
+* importer un CV PDF
+* stocker plusieurs CV
+* définir un CV principal
+* supprimer un CV
+* consulter ses métadonnées
+
+Prévoir ensuite une fonctionnalité permettant à l'IA d'analyser le CV.
+
+Ne stocke pas arbitrairement les fichiers dans la base de données.
+Utilise un stockage adapté.
+
+# 8. ANALYSE DES OFFRES
+
+Créer un service :
+
+`JobAnalysisService`
+
+Il doit pouvoir recevoir :
+
+* titre
+* entreprise
+* description
+* localisation
+* salaire
+* URL
+* plateforme
+
+Et retourner une structure JSON typée contenant notamment :
+
+* résumé
+* compétences requises
+* compétences souhaitées
+* expérience requise
+* niveau d'étude
+* type de contrat
+* localisation
+* responsabilités
+* mots-clés
+* critères éliminatoires
+* score de compatibilité
+* points forts du candidat
+* lacunes du candidat
+* recommandation
+
+Le LLM doit retourner du JSON structuré validé par Zod.
+
+Ne fais jamais confiance directement à une réponse brute du LLM.
+
+# 9. AI PROVIDER
+
+Créer une abstraction :
+
+```ts
+interface AIProvider {
+  analyzeJob(input: AnalyzeJobInput): Promise<JobAnalysis>;
+  calculateMatch(input: MatchInput): Promise<MatchResult>;
+  generateCoverLetter(input: CoverLetterInput): Promise<string>;
+  answerApplicationQuestion(
+    input: ApplicationQuestionInput
+  ): Promise<string>;
+}
+```
+
+Créer :
+
+`OllamaProvider`
+
+Mais l'application doit pouvoir plus tard supporter :
+
+`OpenAIProvider`
+`AnthropicProvider`
+`GoogleProvider`
+
+Le reste de l'application ne doit pas dépendre directement d'Ollama.
+
+# 10. AGENT IA
+
+Ne donne pas au LLM le contrôle direct du navigateur.
+
+L'agent IA doit être un système de décision utilisant des outils contrôlés par l'application.
+
+Prévoir des outils conceptuels comme :
+
+```text
+get_user_profile
+get_resume
+analyze_job
+calculate_match_score
+generate_cover_letter
+get_application_questions
+prepare_answer
+fill_form
+upload_resume
+request_user_confirmation
+submit_application
+save_application
+```
+
+L'agent décide quoi faire.
+
+Le backend ou l'extension exécute réellement les actions.
+
+Exemple :
+
+Utilisateur :
+"Postule à cette offre."
+
+Agent :
+
+1. récupère le profil
+2. récupère le CV
+3. analyse l'offre
+4. calcule le match
+5. prépare les réponses
+6. remplit le formulaire
+7. demande confirmation
+8. soumet
+9. sauvegarde la candidature
+
+# 11. EXTENSION CHROME
+
+Créer une extension Chrome Manifest V3.
+
+Elle doit pouvoir :
+
+* détecter une page d'offre d'emploi
+* récupérer les informations visibles de l'offre
+* envoyer les données au backend
+* recevoir les instructions de remplissage
+* détecter les champs d'un formulaire
+* remplir les champs compatibles
+* détecter les inputs
+* détecter les selects
+* détecter les textareas
+* détecter les upload de fichiers
+* détecter les questions de candidature
+
+Prévoir une abstraction :
+
+```ts
+interface JobPlatformAdapter {
+  canHandle(url: string): boolean;
+  extractJob(): Promise<JobData>;
+  detectApplicationForm(): Promise<FormData>;
+  fillForm(data: FormAnswers): Promise<void>;
+  uploadResume(path: string): Promise<void>;
+}
+```
+
+Créer initialement :
+
+`GenericPlatformAdapter`
+
+L'architecture doit permettre d'ajouter plus tard :
+
+`LinkedInAdapter`
+`IndeedAdapter`
+`CompanyCareerAdapter`
+etc.
+
+Ne contourne pas les CAPTCHA, protections anti-bot ou mécanismes de sécurité des plateformes.
+
+Lorsque l'automatisation n'est pas possible :
+
+`WAITING_USER`
+
+# 12. FORMULAIRE INTELLIGENT
+
+Le système doit essayer de comprendre les champs à partir de :
+
+* label
+* name
+* placeholder
+* aria-label
+* id
+* texte environnant
+* type du champ
+
+Exemples :
+
+"First name"
+"Prénom"
+
+→ firstName
+
+"Last name"
+"Nom"
+
+→ lastName
+
+"Email address"
+
+→ email
+
+"Phone number"
+
+→ phone
+
+"Upload resume"
+
+→ resume
+
+Créer un moteur de mapping configurable.
+
+Ne code pas une liste énorme de règles en dur dans un seul fichier.
+
+# 13. VALIDATION AVANT ENVOI
+
+IMPORTANT.
+
+L'application ne doit pas automatiquement envoyer une candidature dès qu'un formulaire est rempli.
+
+Avant la soumission, afficher un écran de vérification :
+
+* CV utilisé
+* lettre de motivation
+* réponses
+* informations personnelles
+* offre concernée
+* score de compatibilité
+
+Boutons :
+
+"Modifier"
+"Valider et postuler"
+
+Cette étape doit être configurable.
+
+# 14. TABLEAU DE BORD
+
+Créer un dashboard professionnel.
+
+Afficher :
+
+* nombre de candidatures
+* candidatures en cours
+* candidatures envoyées
+* entretiens
+* refus
+* taux de réponse
+
+Prévoir une liste des dernières candidatures.
+
+# 15. PAGE DES OFFRES
+
+Créer une page permettant de :
+
+* ajouter une offre manuellement
+* coller une URL
+* analyser une offre
+* voir son score de compatibilité
+* générer une lettre
+* lancer le processus de candidature
+
+# 16. PAGE CANDIDATURES
+
+Créer une interface de type Kanban ou tableau.
+
+Colonnes/statuts :
+
+À préparer
+En cours
+En attente
+Envoyée
+Entretien
+Refusée
+Acceptée
+
+Chaque candidature doit afficher :
+
+* entreprise
+* poste
+* plateforme
+* date
+* score
+* statut
+
+# 17. AUTOMATISATION
+
+Préparer l'architecture pour permettre plus tard :
+
+"Postule automatiquement aux offres correspondant à mes critères."
+
+Une règle pourrait contenir :
+
+* mots-clés
+* localisation
+* salaire minimum
+* score minimum
+* type de contrat
+* CV à utiliser
+* lettre à utiliser
+* validation obligatoire ou non
+
+Ne développe pas forcément toute l'automatisation avancée maintenant.
+
+Prépare une architecture propre.
+
+# 18. SÉCURITÉ
+
+Prendre au sérieux :
+
+* validation des entrées
+* authentification
+* autorisation
+* rate limiting
+* protection CSRF si nécessaire
+* XSS
+* injections SQL via ORM
+* upload sécurisé
+* contrôle des types de fichiers
+* taille maximale des fichiers
+* secrets dans `.env`
+* logs sans données personnelles sensibles
+
+Ne jamais exposer :
+
+* mots de passe
+* tokens
+* clés API
+* secrets
+* contenu sensible inutilement dans les logs
+
+# 19. VARIABLES D'ENVIRONNEMENT
+
+Créer :
+
+`.env.example`
+
+avec des variables du type :
+
+DATABASE_URL=
+REDIS_URL=
+OLLAMA_BASE_URL=
+OLLAMA_MODEL=
+STORAGE_ENDPOINT=
+STORAGE_BUCKET=
+STORAGE_ACCESS_KEY=
+STORAGE_SECRET_KEY=
+AUTH_SECRET=
+
+Ne jamais committer `.env`.
+
+# 20. DOCUMENTATION
+
+Créer un README expliquant :
+
+* architecture
+* prérequis
+* installation
+* variables d'environnement
+* lancement en développement
+* lancement de PostgreSQL
+* lancement de Redis
+* configuration d'Ollama
+* lancement du frontend
+* lancement du backend
+* lancement de l'extension
+* tests
+* build
+
+Créer également :
+
+`docs/architecture.md`
+
+et :
+
+`docs/roadmap.md`
+
+# 21. MÉTHODE DE DÉVELOPPEMENT
+
+NE CODE PAS TOUT LE PROJET EN UNE SEULE FOIS.
+
+Travaille par phases.
+
+PHASE 1 :
+
+* analyser l'environnement
+* vérifier le dossier du projet
+* créer l'architecture monorepo
+* configurer TypeScript
+* configurer linting/formatage
+* configurer les scripts
+* créer README
+* vérifier que tout démarre
+
+PHASE 2 :
+
+* PostgreSQL
+* Prisma
+* schéma de base de données
+* migrations
+* seed de développement
+
+PHASE 3 :
+
+* authentification
+* User
+* Profile
+* expériences
+* formations
+* compétences
+* préférences
+
+PHASE 4 :
+
+* gestion des CV
+* stockage
+* upload
+* interface
+
+PHASE 5 :
+
+* Job
+* JobAnalysis
+* AIProvider
+* OllamaProvider
+* analyse structurée des offres
+
+PHASE 6 :
+
+* calcul de compatibilité
+* génération de lettres
+* dashboard
+* suivi des candidatures
+
+PHASE 7 :
+
+* extension Chrome
+* extraction d'offre
+* détection de formulaire
+* remplissage
+
+PHASE 8 :
+
+* système d'agent
+* orchestration
+* validation utilisateur
+* logs
+* gestion WAITING_USER
+
+PHASE 9 :
+
+* tests
+* sécurité
+* optimisation
+* documentation
+* préparation au déploiement
+
+# 22. RÈGLE IMPORTANTE SUR LES DÉCISIONS
+
+Lorsque plusieurs solutions sont possibles :
+
+1. privilégie la simplicité
+2. privilégie les standards
+3. privilégie la maintenabilité
+4. évite les dépendances inutiles
+5. évite le code prématurément complexe
+
+Si une fonctionnalité nécessite une décision importante, explique brièvement la décision avant de l'implémenter.
+
+# 23. RÈGLE SUR LE CODE
+
+Avant d'écrire du code :
+
+* inspecte les fichiers existants
+* identifie ce qui peut être réutilisé
+* vérifie les dépendances déjà installées
+* vérifie les scripts existants
+
+Ne supprime pas arbitrairement du code existant.
+
+Si le projet est vide, initialise-le proprement.
+
+Après chaque phase :
+
+* lance les vérifications TypeScript
+* lance le lint
+* lance les tests disponibles
+* corrige les erreurs
+* indique clairement ce qui a été terminé
+
+# 24. COMMENCE MAINTENANT
+
+Commence par analyser le dossier actuel.
+
+Ne commence pas immédiatement à générer des centaines de fichiers.
+
+Première étape :
+
+1. inspecte le projet
+2. détermine s'il est vide ou existant
+3. analyse sa structure
+4. vérifie Node.js/npm/pnpm/bun disponibles
+5. vérifie les dépendances
+6. propose l'architecture finale
+7. crée uniquement les fondations de la PHASE 1
+8. lance les vérifications
+9. donne-moi un résumé des fichiers créés/modifiés et des prochaines étapes
+
+À partir de maintenant, considère ce document comme le cahier des charges technique de référence du projet.

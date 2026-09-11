@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@shared/*": ["packages/shared/src/*"],
+      "@database/*": ["packages/database/src/*"],
+      "@ai/*": ["packages/ai/src/*"],
+      "@validation/*": ["packages/validation/src/*"],
+      "@config/*": ["packages/config/src/*"]
+    }
+  },
+  "exclude": ["node_modules", ".next", "dist", "build"],
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/database" },
+    { "path": "./packages/ai" },
+    { "path": "./packages/validation" },
+    { "path": "./packages/config" },
+    { "path": "./apps/api" },
+    { "path": "./apps/extension" }
+  ]
+}

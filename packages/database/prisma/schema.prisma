@@ -1,0 +1,357 @@
+// Prisma schema for JobPilot
+// This file defines the database models and relationships
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Enums
+enum JobStatus {
+  DRAFT
+  PUBLISHED
+  PAUSED
+  CLOSED
+}
+
+enum ApplicationStatus {
+  DRAFT
+  PENDING
+  PROCESSING
+  WAITING_USER
+  SUBMITTED
+  REVIEWING
+  SHORTLISTED
+  INTERVIEW_SCHEDULED
+  FAILED
+  REJECTED
+  INTERVIEW
+  ACCEPTED
+}
+
+enum UserRole {
+  CANDIDATE
+  RECRUITER
+  ADMIN
+}
+
+enum InterviewMode {
+  VIDEO
+  PHONE
+  ONSITE
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum ApplicationActivityType {
+  STATUS_CHANGED
+  RECRUITER_NOTE_UPDATED
+  INTERVIEW_SCHEDULED
+}
+
+// Models
+model User {
+  id                    String                @id @default(uuid())
+  email                 String                @unique
+  password              String // hashed password
+  firstName             String
+  lastName              String
+  phone                 String?
+  role                  UserRole              @default(CANDIDATE)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  profile               Profile?
+  experiences           Experience[]
+  educations            Education[]
+  skills                Skill[]
+  resumes               Resume[]
+  coverLetters          CoverLetter[]
+  jobPreferences        JobPreference?
+  applications          Application[]
+  automationRules       AutomationRule[]
+  notifications         Notification[]
+  postedJobs            Job[]                 @relation("PostedJobs")
+  applicationActivities ApplicationActivity[] @relation("ActivityActor")
+  createdInterviews     Interview[]           @relation("InterviewCreator")
+
+  @@index([email], name: "user_email_idx")
+}
+
+model Profile {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id])
+  title               String?
+  professionalSummary String?
+  yearsOfExperience   Int?
+  availability        String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId], name: "profile_userid_idx")
+}
+
+model Experience {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  company      String
+  position     String
+  startDate    DateTime
+  endDate      DateTime?
+  description  String?
+  achievements String[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId], name: "experience_userid_idx")
+}
+
+model Education {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  institution  String
+  degree       String
+  fieldOfStudy String?
+  startDate    DateTime
+  endDate      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId], name: "education_userid_idx")
+}
+
+model Skill {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  level     Int? // 1-5 or similar
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId], name: "skill_userid_idx")
+}
+
+model Resume {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  title        String
+  fileUrl      String? // optional URL to the file in storage
+  fileName     String? // original uploaded filename
+  fileMimeType String? // uploaded file mime type
+  fileContent  String? // base64 content for local prototype uploads
+  isPrimary    Boolean       @default(false)
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId], name: "resume_userid_idx")
+}
+
+model Interview {
+  id              String          @id @default(uuid())
+  applicationId   String
+  application     Application     @relation(fields: [applicationId], references: [id])
+  createdByUserId String
+  createdBy       User            @relation("InterviewCreator", fields: [createdByUserId], references: [id])
+  scheduledAt     DateTime
+  timezone        String
+  mode            InterviewMode
+  meetingUrl      String?
+  notes           String?
+  status          InterviewStatus @default(SCHEDULED)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([applicationId, scheduledAt], name: "interview_application_schedule_idx")
+  @@index([createdByUserId], name: "interview_creator_idx")
+}
+
+model ApplicationActivity {
+  id            String                  @id @default(uuid())
+  applicationId String
+  application   Application             @relation(fields: [applicationId], references: [id])
+  actorUserId   String?
+  actor         User?                   @relation("ActivityActor", fields: [actorUserId], references: [id])
+  type          ApplicationActivityType
+  fromStatus    ApplicationStatus?
+  toStatus      ApplicationStatus?
+  details       Json?
+  createdAt     DateTime                @default(now())
+
+  @@index([applicationId, createdAt], name: "application_activity_history_idx")
+  @@index([actorUserId], name: "application_activity_actor_idx")
+}
+
+model CoverLetter {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  title        String
+  content      String
+  isPrimary    Boolean       @default(false)
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId], name: "coverletter_userid_idx")
+}
+
+model JobPreference {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  jobTitles     String[] // array of strings for job titles sought
+  locations     String[] // preferred locations
+  remote        Boolean  @default(false)
+  minSalary     Int? // minimum salary in USD or local currency
+  contractTypes String[] // e.g., ["full-time", "part-time", "contract"]
+  industries    String[] // sectors of interest
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId], name: "jobpreference_userid_idx")
+}
+
+model Job {
+  id             String        @id @default(uuid())
+  platform       String // e.g., "linkedin", "indeed", "company"
+  platformId     String // the ID of the job on the platform
+  title          String
+  company        String
+  description    String?
+  location       String?
+  salary         String? // could be a range or specific value
+  url            String        @unique // the original job posting URL
+  contactEmail   String? // email de contact ou de candidature extrait de l'offre
+  postedAt       DateTime?
+  retrievedAt    DateTime      @default(now())
+  postedByUserId String? // recruiter who published this job, when applicable
+  status         JobStatus @default(PUBLISHED)
+  postedBy       User?         @relation("PostedJobs", fields: [postedByUserId], references: [id])
+  // We'll store the analysis in a separate model or as JSON? Let's create a JobAnalysis model.
+  analyses       JobAnalysis[]
+  applications   Application[]
+
+  @@index([platform, platformId], name: "job_platform_idx")
+  @@index([postedByUserId], name: "job_postedby_idx")
+  @@index([status], name: "job_status_idx")
+}
+
+model JobAnalysis {
+  id                  String   @id @default(uuid())
+  jobId               String
+  job                 Job      @relation(fields: [jobId], references: [id])
+  summary             String?
+  requiredSkills      String[] // array of strings
+  desiredSkills       String[] // array of strings
+  requiredExperience  String?
+  requiredEducation   String?
+  contractType        String?
+  location            String?
+  responsibilities    String[] // array of strings
+  keywords            String[] // array of strings
+  eliminationCriteria String[] // array of strings
+  compatibilityScore  Float? // 0-100
+  strengths           String[] // array of strings
+  weaknesses          String[] // array of strings
+  recommendation      String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([jobId], name: "analysis_jobid_idx")
+}
+
+model Application {
+  id                 String                @id @default(uuid())
+  userId             String
+  jobId              String
+  user               User                  @relation(fields: [userId], references: [id])
+  job                Job                   @relation(fields: [jobId], references: [id])
+  resumeId           String?
+  resume             Resume?               @relation(fields: [resumeId], references: [id])
+  coverLetterId      String?
+  coverLetter        CoverLetter?          @relation(fields: [coverLetterId], references: [id])
+  status             ApplicationStatus     @default(DRAFT)
+  compatibilityScore Float?
+  recruiterNotes     String? // note interne visible uniquement par les recruteurs
+  hiringMessage      String? // promesse d'embauche / message de confirmation envoye au candidat accepte
+  answers            ApplicationAnswer[]
+  interviews         Interview[]
+  activities         ApplicationActivity[]
+  automationLog      AutomationLog?
+  submittedAt        DateTime?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@index([userId], name: "application_userid_idx")
+  @@index([jobId], name: "application_jobid_idx")
+}
+
+model ApplicationAnswer {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  question      String
+  answer        String
+  createdAt     DateTime    @default(now())
+}
+
+model AutomationRule {
+  id             String          @id @default(uuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id])
+  name           String
+  keywords       String[] // array of strings
+  locations      String[] // array of strings
+  minSalary      Int?
+  minScore       Float? // minimum compatibility score to trigger
+  contractTypes  String[] // array of strings
+  resumeId       String? // which resume to use
+  coverLetterId  String? // which cover letter to use
+  autoApply      Boolean         @default(false) // explicit candidate opt-in: submit matching applications automatically
+  automationLogs AutomationLog[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([userId], name: "automationrule_userid_idx")
+}
+
+model AutomationLog {
+  id               String         @id @default(uuid())
+  automationRuleId String
+  automationRule   AutomationRule @relation(fields: [automationRuleId], references: [id])
+  applicationId    String?        @unique // if an application was created from this rule
+  application      Application?   @relation(fields: [applicationId], references: [id])
+  status           String // e.g., "STARTED", "JOB_FOUND", "ANALYZED", "APPLIED", "FAILED"
+  details          Json? // any additional details
+  createdAt        DateTime       @default(now())
+
+  @@index([automationRuleId], name: "automationlog_ruleid_idx")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  body      String
+  link      String? // chemin interne vers la ressource concernee (ex: /dashboard/applications)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId], name: "notification_userid_idx")
+}

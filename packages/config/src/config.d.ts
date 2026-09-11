@@ -1,0 +1,47 @@
+import { z } from 'zod';
+declare const configSchema: z.ZodObject<{
+    DATABASE_URL: z.ZodString;
+    REDIS_URL: z.ZodString;
+    OLLAMA_BASE_URL: z.ZodString;
+    OLLAMA_MODEL: z.ZodString;
+    STORAGE_ENDPOINT: z.ZodString;
+    STORAGE_BUCKET: z.ZodString;
+    STORAGE_ACCESS_KEY: z.ZodString;
+    STORAGE_SECRET_KEY: z.ZodString;
+    AUTH_SECRET: z.ZodString;
+    FRONTEND_URL: z.ZodDefault<z.ZodString>;
+    NEXTAUTH_URL: z.ZodString;
+    NEXTAUTH_SECRET: z.ZodString;
+    NODE_ENV: z.ZodDefault<z.ZodEnum<["development", "production", "test"]>>;
+}, "strip", z.ZodTypeAny, {
+    DATABASE_URL: string;
+    REDIS_URL: string;
+    OLLAMA_BASE_URL: string;
+    OLLAMA_MODEL: string;
+    STORAGE_ENDPOINT: string;
+    STORAGE_BUCKET: string;
+    STORAGE_ACCESS_KEY: string;
+    STORAGE_SECRET_KEY: string;
+    AUTH_SECRET: string;
+    FRONTEND_URL: string;
+    NEXTAUTH_URL: string;
+    NEXTAUTH_SECRET: string;
+    NODE_ENV: "development" | "production" | "test";
+}, {
+    DATABASE_URL: string;
+    REDIS_URL: string;
+    OLLAMA_BASE_URL: string;
+    OLLAMA_MODEL: string;
+    STORAGE_ENDPOINT: string;
+    STORAGE_BUCKET: string;
+    STORAGE_ACCESS_KEY: string;
+    STORAGE_SECRET_KEY: string;
+    AUTH_SECRET: string;
+    NEXTAUTH_URL: string;
+    NEXTAUTH_SECRET: string;
+    FRONTEND_URL?: string | undefined;
+    NODE_ENV?: "development" | "production" | "test" | undefined;
+}>;
+export type Config = z.infer<typeof configSchema>;
+declare let config: Config;
+export { config };
