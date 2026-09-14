@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: jobpilot-web
+    env: node
+    buildCommand: cd apps/web && npm install && npm run build
+    startCommand: cd apps/web && npm start
+    staticPublishPath: .next
+    # Note: For Next.js, we can also use the built-in static site deployment if we export.
+    # But since we have an API and might use server-side features, we use Node.js.
+    # Alternatively, we can use:
+    #   staticPublishPath: out
+    #   and then run `next export` in the build command.
+    # However, the current setup uses `next start` so we'll keep as Node.js.
+
+  - type: web
+    name: jobpilot-api
+    env: node
+    buildCommand: cd apps/api && npm install && npm run build
+    startCommand: cd apps/api && npm start
+    # The API service will expose a port (default 3000 for Express? We need to check)
+    # In the API, we should set the port from the environment variable PORT.
+    # Let's check the API server.ts to see if it uses PORT.
