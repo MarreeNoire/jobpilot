@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "start": "turbo run start",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
@@ -19,5 +20,8 @@
     "prettier": "^3.2.5",
     "turbo": "^2.0.0",
     "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "kimi-cli": "^0.0.2"
   }
 }
