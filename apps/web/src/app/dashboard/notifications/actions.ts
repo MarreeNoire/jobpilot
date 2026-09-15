@@ -16,6 +16,8 @@ export interface AppNotification {
 export interface NotificationsResult {
   notifications: AppNotification[];
   unreadCount: number;
+  totalPages: number;
+  total: number;
 }
 
 async function getToken(): Promise<string | undefined> {
@@ -23,27 +25,34 @@ async function getToken(): Promise<string | undefined> {
   return cookieStore.get('jobpilot_token')?.value;
 }
 
-export async function getNotifications(): Promise<NotificationsResult> {
+export async function getNotifications(page = 1, limit = 50): Promise<NotificationsResult> {
   const token = await getToken();
 
   if (!token) {
-    return { notifications: [], unreadCount: 0 };
+    return { notifications: [], unreadCount: 0, totalPages: 1, total: 0 };
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+    const response = await fetch(`${API_BASE_URL}/api/notifications?page=${page}&limit=${limit}`, {
       headers: { Cookie: `jobpilot_token=${token}` },
       cache: 'no-store',
     });
 
     if (!response.ok) {
-      return { notifications: [], unreadCount: 0 };
+      return { notifications: [], unreadCount: 0, totalPages: 1, total: 0 };
     }
 
-    const data = (await response.json()) as NotificationsResult;
-    return { notifications: data.notifications ?? [], unreadCount: data.unreadCount ?? 0 };
+    const data = (await response.json()) as NotificationsResult & {
+      pagination?: { totalPages: number; total: number };
+    };
+    return {
+      notifications: data.notifications ?? [],
+      unreadCount: data.unreadCount ?? 0,
+      totalPages: data.pagination?.totalPages ?? 1,
+      total: data.pagination?.total ?? data.notifications?.length ?? 0,
+    };
   } catch {
-    return { notifications: [], unreadCount: 0 };
+    return { notifications: [], unreadCount: 0, totalPages: 1, total: 0 };
   }
 }
 
@@ -59,6 +68,26 @@ export async function markNotificationReadAction(notificationId: string): Promis
 
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/notifications');
+}
+
+export async function getNotificationById(notificationId: string): Promise<AppNotification | null> {
+  const token = await getToken();
+  if (!token) return null;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}`, {
+      headers: { Cookie: `jobpilot_token=${token}` },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  } catch {
+    return null;
+  }
 }
 
 export async function markAllNotificationsReadAction(): Promise<void> {

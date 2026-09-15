@@ -36,9 +36,11 @@ export function NotificationsList({ initialNotifications, initialUnreadCount }: 
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
+      // Navigate first, then mark as read in background
+      router.push(target);
       startTransition(async () => {
         await markNotificationReadAction(notification.id);
-        router.push(target);
+        // Note: We don't handle errors here as navigation already happened
       });
     } else {
       router.push(target);

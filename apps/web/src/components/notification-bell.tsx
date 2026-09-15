@@ -79,13 +79,15 @@ export function NotificationBell({ initialNotifications, initialUnreadCount }: N
 
     if (!notification.isRead) {
       setNotifications((prev) =>
-        prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
+        prev.map((n(prev).map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
+      // Navigate first, then mark as read in background
+      router.push(target);
       startTransition(async () => {
         await markNotificationReadAction(notification.id);
-        router.push(target);
+        // Note: We don't handle errors here as navigation already happened
       });
     } else {
       router.push(target);
@@ -110,7 +112,7 @@ export function NotificationBell({ initialNotifications, initialUnreadCount }: N
         onClick={handleToggle}
         aria-label="Notifications"
         aria-expanded={open}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
       >
         <Bell className="h-4.5 w-4.5" />
         {unreadCount > 0 && (

@@ -10,14 +10,22 @@ export async function listNotifications(
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> {
-  const [notifications, unreadCount] = await Promise.all([
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 50));
+  const skip = (page - 1) * limit;
+
+  const [notifications, unreadCount, total] = await Promise.all([
     prisma.notification.findMany({
       where: { userId: req.userId },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      skip,
+      take: limit,
     }),
     prisma.notification.count({
       where: { userId: req.userId, isRead: false },
+    }),
+    prisma.notification.count({
+      where: { userId: req.userId },
     }),
   ]);
 
@@ -31,6 +39,41 @@ export async function listNotifications(
       createdAt: notification.createdAt.toISOString(),
     })),
     unreadCount,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    },
+  });
+}
+
+/**
+ * Récupère une notification précise par son ID. Renvoie 404 si non trouvée ou
+ * n'appartient pas à l'utilisateur connecté.
+ */
+export async function getNotificationById(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> {
+  const { id } = req.params;
+
+  const notification = await prisma.notification.findFirst({
+    where: { id, userId: req.userId },
+  });
+
+  if (!notification) {
+    res.status(404).json({ error: 'Notification not found' });
+    return;
+  }
+
+  res.status(200).json({
+    id: notification.id,
+    title: notification.title,
+    body: notification.body,
+    link: notification.link,
+    isRead: notification.isRead,
+    createdAt: notification.createdAt.toISOString(),
   });
 }
 
