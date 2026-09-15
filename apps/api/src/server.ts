@@ -13,7 +13,12 @@ import { syncAllJobSources } from './services/jobSyncService';
 const app = express();
 
 // Middleware
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    frameguard: false,
+  })
+);
 app.use(
   cors({
     origin: config.FRONTEND_URL,
