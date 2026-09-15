@@ -20,7 +20,9 @@
     "prettier": "^3.2.5"
   },
   "dependencies": {
+    "@prisma/client": "^5.10.0",
     "kimi-cli": "^0.0.2",
+    "prisma": "^5.10.0",
     "turbo": "^2.0.0",
     "typescript": "^5.4.0"
   }

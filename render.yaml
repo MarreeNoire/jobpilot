@@ -7,8 +7,8 @@ services:
     env: node
     plan: free
     region: frankfurt
-    buildCommand: npm install --include=dev && npx prisma db push --schema=packages/database/prisma/schema.prisma && npx turbo run build --filter=api
-    startCommand: npm run start --workspace=apps/api
+    buildCommand: npm install --include=dev && npx prisma generate --schema=packages/database/prisma/schema.prisma && npx turbo run build --filter=api
+    startCommand: npx prisma db push --schema=packages/database/prisma/schema.prisma && npm run start --workspace=apps/api
     envVars:
       - key: NODE_ENV
         value: production
@@ -40,7 +40,7 @@ services:
     env: node
     plan: free
     region: frankfurt
-    buildCommand: npm install --include=dev && npx turbo run build --filter=web
+    buildCommand: npm install --include=dev && npx prisma generate --schema=packages/database/prisma/schema.prisma && npx turbo run build --filter=web
     startCommand: npm run start --workspace=apps/web
     envVars:
       - key: NODE_ENV
