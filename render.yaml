@@ -1,3 +1,4 @@
+# Render configuration for JobPilot monorepo - using npm workspaces
 services:
   - type: web
     name: jobpilot-web
