@@ -2,12 +2,12 @@ services:
   - type: web
     name: jobpilot-web
     env: node
-    buildCommand: npm install && npx turbo run build --filter=web
-    startCommand: npx turbo run start --filter=web
+    buildCommand: npm install && npm run build --workspace=apps/web
+    startCommand: npm run start --workspace=apps/web
     staticPublishPath: .next
 
   - type: web
     name: jobpilot-api
     env: node
-    buildCommand: npm install && npx turbo run build --filter=api
-    startCommand: npx turbo run start --filter=api
+    buildCommand: npm install && npm run build --workspace=apps/api
+    startCommand: npm run start --workspace=apps/api
