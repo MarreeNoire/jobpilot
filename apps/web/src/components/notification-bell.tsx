@@ -79,7 +79,7 @@ export function NotificationBell({ initialNotifications, initialUnreadCount }: N
 
     if (!notification.isRead) {
       setNotifications((prev) =>
-        prev.map((n(prev).map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
+        prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
