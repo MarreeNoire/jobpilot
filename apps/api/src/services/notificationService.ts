@@ -204,6 +204,38 @@ export async function notifyAutoApplicationBatch(
   });
 }
 
+/**
+ * Notifie le recruteur qu'une action du candidat (soumission ou retrait)
+ * vient de se produire sur l'une de ses offres.
+ */
+export async function notifyRecruiterApplicationEvent(params: {
+  recruiterUserId: string | null | undefined;
+  candidateName: string;
+  jobTitle: string;
+  company: string;
+  jobId: string;
+  event: 'SUBMITTED' | 'WITHDRAWN';
+}): Promise<void> {
+  if (!params.recruiterUserId) return;
+
+  const title = params.event === 'SUBMITTED' ? 'Nouvelle candidature reçue' : 'Candidature retirée';
+  const body =
+    params.event === 'SUBMITTED'
+      ? `${params.candidateName} vient de soumettre sa candidature pour "${params.jobTitle}" chez ${params.company}.`
+      : `${params.candidateName} a retiré sa candidature pour "${params.jobTitle}" chez ${params.company}.`;
+
+  await prisma.notification.create({
+    data: {
+      userId: params.recruiterUserId,
+      title,
+      body,
+      link: `/dashboard/jobs/${params.jobId}/applications`,
+    },
+  });
+
+  await dispatchEmail({ userId: params.recruiterUserId, subject: title, body });
+}
+
 export async function notifyApplicationStatusChange(
   params: NotifyApplicationStatusChangeParams
 ): Promise<void> {

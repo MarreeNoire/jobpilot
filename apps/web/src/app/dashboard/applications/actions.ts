@@ -24,6 +24,7 @@ export interface Application {
     | 'INTERVIEW'
     | 'ACCEPTED';
   compatibilityScore: number | null;
+  hiringMessage: string | null;
   submittedAt: string | null;
   createdAt: string;
   updatedAt: string;

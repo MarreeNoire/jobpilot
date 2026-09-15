@@ -13,6 +13,7 @@ import {
   notifyApplicationStatusChange,
   notifyInterviewScheduled,
   notifyNewApplication,
+  notifyRecruiterApplicationEvent,
 } from '../services/notificationService';
 
 const JOB_SELECT = {
@@ -23,6 +24,12 @@ const JOB_SELECT = {
   url: true,
   postedByUserId: true,
 } as const;
+
+const CANDIDATE_ALLOWED_STATUSES = new Set(['DRAFT', 'PENDING', 'PROCESSING', 'WAITING_USER', 'SUBMITTED']);
+
+// Le candidat peut retirer sa candidature (statut REJECTED) uniquement
+// tant qu'elle est encore active dans le pipeline recruteur.
+const CANDIDATE_WITHDRAWABLE_FROM = new Set(['SUBMITTED', 'REVIEWING', 'SHORTLISTED', 'INTERVIEW_SCHEDULED']);
 
 const RECRUITER_TECHNICAL_STATUSES = new Set([
   'DRAFT',
@@ -63,6 +70,7 @@ function toApplicationResponse(application: {
   coverLetterId: string | null;
   status: string;
   compatibilityScore: number | null;
+  hiringMessage: string | null;
   submittedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -645,7 +653,10 @@ export async function updateApplicationStatus(
   const isOwningRecruiter =
     req.userRole === 'RECRUITER' && existing.job.postedByUserId === req.userId;
 
-  if (isOwningCandidate && !['DRAFT', 'PENDING', 'PROCESSING', 'WAITING_USER', 'SUBMITTED'].includes(data.status)) {
+  const isCandidateWithdrawal =
+    isOwningCandidate && data.status === 'REJECTED' && CANDIDATE_WITHDRAWABLE_FROM.has(existing.status);
+
+  if (isOwningCandidate && !CANDIDATE_ALLOWED_STATUSES.has(data.status) && !isCandidateWithdrawal) {
     res.status(403).json({ error: 'Candidate cannot set this application status' });
     return;
   }
@@ -708,6 +719,24 @@ export async function updateApplicationStatus(
       company: existing.job.company,
       status: updated.status,
       message: data.message,
+    });
+  }
+
+  // A l'inverse, quand c'est le candidat qui soumet ou retire sa
+  // candidature, on notifie le recruteur proprietaire de l'offre.
+  if (isOwningCandidate && statusChanged && (data.status === 'SUBMITTED' || isCandidateWithdrawal)) {
+    const candidate = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { firstName: true, lastName: true },
+    });
+
+    await notifyRecruiterApplicationEvent({
+      recruiterUserId: existing.job.postedByUserId,
+      candidateName: candidate ? `${candidate.firstName} ${candidate.lastName}` : 'Un candidat',
+      jobTitle: existing.job.title,
+      company: existing.job.company,
+      jobId: existing.job.id,
+      event: data.status === 'SUBMITTED' ? 'SUBMITTED' : 'WITHDRAWN',
     });
   }
 
