@@ -7,7 +7,7 @@ services:
     runtime: node
     plan: free
     buildCommand: npm ci && npm run build
-    startCommand: node apps/api/dist/apps/api/src/server.js
+    startCommand: node apps/api/dist/server.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -34,7 +34,7 @@ services:
     name: jobpilot-web
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build --workspace=web
+    buildCommand: npm ci && npm run build --workspace=apps/web
     startCommand: cd apps/web && npx next start -p $PORT
     envVars:
       - key: NODE_ENV
