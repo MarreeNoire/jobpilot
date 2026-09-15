@@ -1,14 +1,43 @@
-# Render configuration for JobPilot monorepo - using npm workspaces
+# JobPilot - Deploiement Render (blueprint)
+# Base de donnees : Supabase PostgreSQL (deja utilisee par le projet, voir .env)
 services:
-  - type: web
-    name: jobpilot-web
-    env: node
-    buildCommand: npm install && echo "Node version: $(node -v)" && echo "Installed workspace packages:" && npx ls workspace --parseable && npm run build --workspace=apps/web
-    startCommand: npm run start --workspace=apps/web
-    staticPublishPath: .next
-
+  # API Express (apps/api)
   - type: web
     name: jobpilot-api
-    env: node
-    buildCommand: npm install && echo "Node version: $(node -v)" && echo "Installed workspace packages:" && npx ls workspace --parseable && npm run build --workspace=apps/api
-    startCommand: npm run start --workspace=apps/api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: node apps/api/dist/apps/api/src/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://jobpilot-web.onrender.com
+      - key: DATABASE_URL
+        sync: false # a renseigner dans le tableau de bord Render (Supabase, pooler 6543)
+      - key: DIRECT_URL
+        sync: false # a renseigner dans le tableau de bord Render (Supabase, port 5432)
+      - key: AUTH_SECRET
+        sync: false # a renseigner dans le tableau de bord Render
+      - key: STORAGE_ENDPOINT
+        sync: false
+      - key: STORAGE_BUCKET
+        sync: false
+      - key: STORAGE_ACCESS_KEY
+        sync: false
+      - key: STORAGE_SECRET_KEY
+        sync: false
+
+  # Frontend Next.js (apps/web)
+  - type: web
+    name: jobpilot-web
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build --workspace=web
+    startCommand: cd apps/web && npx next start -p $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://jobpilot-api.onrender.com
