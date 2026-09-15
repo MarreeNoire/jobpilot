@@ -1,7 +1,25 @@
 import './globals.css';
-import { Inter } from 'next/font/google';
+import { Work_Sans, Fraunces, IBM_Plex_Mono } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+const workSans = Work_Sans({
+  subsets: ['latin'],
+  variable: '--font-work-sans',
+  display: 'swap',
+});
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  variable: '--font-plex-mono',
+  weight: ['400', '500', '600'],
+  display: 'swap',
+});
 
 export const metadata = {
   title: "JobPilot — Assistant Intelligent de Recherche d'Emploi",
@@ -15,7 +33,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className="h-full scroll-smooth">
-      <body className={`${inter.className} min-h-full flex flex-col text-slate-900 antialiased`}>
+      <body className={`${workSans.variable} ${fraunces.variable} ${plexMono.variable} font-sans min-h-full flex flex-col text-slate-900 antialiased`}>
         {children}
       </body>
     </html>

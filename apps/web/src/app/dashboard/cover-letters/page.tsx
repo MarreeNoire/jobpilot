@@ -23,7 +23,7 @@ export default async function CoverLettersPage() {
             <FileText className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Lettres de motivation</h1>
+            <h1 className="font-serif text-2xl font-semibold tracking-tight text-slate-900">Lettres de motivation</h1>
             <p className="text-xs text-slate-500">
               Rédigez, sauvegardez et gérez vos lettres. Elles seront proposées lors de chaque candidature.
             </p>

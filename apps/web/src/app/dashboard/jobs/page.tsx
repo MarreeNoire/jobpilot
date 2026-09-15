@@ -36,17 +36,17 @@ async function getCandidateSkills(token: string): Promise<string[]> {
   }
 }
 
-async function getJobs(role: UserRole): Promise<Job[]> {
+async function getJobs(role: UserRole, page: number): Promise<{ jobs: Job[]; totalPages: number; total: number }> {
   const cookieStore = await cookies();
   const token = cookieStore.get('jobpilot_token')?.value;
 
   if (!token) {
-    return [];
+    return { jobs: [], totalPages: 1, total: 0 };
   }
 
   const endpoint = role === 'RECRUITER' ? '/api/jobs/mine' : '/api/jobs';
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_BASE_URL}${endpoint}?page=${page}&limit=5`, {
     headers: {
       Cookie: `jobpilot_token=${token}`,
     },
@@ -54,20 +54,33 @@ async function getJobs(role: UserRole): Promise<Job[]> {
   });
 
   if (!response.ok) {
-    return [];
+    return { jobs: [], totalPages: 1, total: 0 };
   }
 
-  const data = (await response.json()) as { jobs: Job[] };
-  return data.jobs;
+  const data = (await response.json()) as {
+    jobs: Job[];
+    pagination?: { totalPages: number; total: number };
+  };
+  return {
+    jobs: data.jobs,
+    totalPages: data.pagination?.totalPages ?? 1,
+    total: data.pagination?.total ?? data.jobs.length,
+  };
 }
 
-export default async function JobsPage() {
+export default async function JobsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const user = await requireCurrentUser();
   const cookieStore = await cookies();
   const token = cookieStore.get('jobpilot_token')?.value ?? '';
+  const resolvedParams = await searchParams;
+  const currentPage = Math.max(1, parseInt(resolvedParams.page ?? '1') || 1);
 
-  const [jobs, preferences] = await Promise.all([
-    getJobs(user.role),
+  const [{ jobs, totalPages, total }, preferences] = await Promise.all([
+    getJobs(user.role, currentPage),
     user.role === 'CANDIDATE' ? getPreferences(token) : null,
   ]);
 
@@ -104,6 +117,34 @@ export default async function JobsPage() {
         </div>
 
         <JobManager jobs={jobs} userRole={user.role} preferences={preferences} />
+
+        {totalPages > 1 && (
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <p className="docket">
+              {total} offre{total > 1 ? 's' : ''} au total — page {currentPage} sur {totalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/dashboard/jobs?page=${Math.max(1, currentPage - 1)}`}
+                aria-disabled={currentPage <= 1}
+                className={`inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 ${
+                  currentPage <= 1 ? 'pointer-events-none opacity-40' : ''
+                }`}
+              >
+                Précédent
+              </Link>
+              <Link
+                href={`/dashboard/jobs?page=${Math.min(totalPages, currentPage + 1)}`}
+                aria-disabled={currentPage >= totalPages}
+                className={`inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 ${
+                  currentPage >= totalPages ? 'pointer-events-none opacity-40' : ''
+                }`}
+              >
+                Suivant
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

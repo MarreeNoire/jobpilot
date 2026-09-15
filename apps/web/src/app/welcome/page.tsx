@@ -79,33 +79,33 @@ const features = [
 
 export default function WelcomePage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-black selection:bg-blue-500 selection:text-white">
       {/* Navigation Bar */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-50 border-b border-blue-800/30 bg-gradient-to-r from-blue-700 to-blue-600 shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link href="/welcome" className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
               <Sparkles className="h-5 w-5" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">JobPilot</span>
+            <span className="text-xl font-bold tracking-tight text-white">JobPilot</span>
           </Link>
 
-          <div className="hidden items-center gap-8 md:flex text-sm font-medium text-slate-600">
-            <a href="#features" className="hover:text-blue-600 transition">Fonctionnalités</a>
-            <a href="#workflow" className="hover:text-blue-600 transition">Comment ça marche</a>
-            <a href="#preview" className="hover:text-blue-600 transition">Aperçu interactif</a>
+          <div className="hidden items-center gap-8 md:flex text-sm font-medium text-blue-50/90">
+            <a href="#features" className="hover:text-white transition">Fonctionnalités</a>
+            <a href="#workflow" className="hover:text-white transition">Comment ça marche</a>
+            <a href="#preview" className="hover:text-white transition">Aperçu interactif</a>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+              className="rounded-xl px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/10 transition"
             >
               Connexion
             </Link>
             <a
               href="#choisir-espace"
-              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition"
+              className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-blue-700 shadow-md transition hover:bg-blue-50"
             >
               Commencer
             </a>
@@ -125,7 +125,7 @@ export default function WelcomePage() {
 
           <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
             Décrochez votre prochain emploi, <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 bg-clip-text text-transparent">
+            <span className="text-blue-700 font-bold">
               5x plus vite grâce à l'IA
             </span>
           </h1>
@@ -196,7 +196,7 @@ export default function WelcomePage() {
               <p className="mt-1 text-xs font-medium text-slate-500">Taux de pertinence des offres</p>
             </div>
             <div>
-              <p className="text-3xl font-extrabold text-indigo-600">x3</p>
+              <p className="text-3xl font-extrabold text-jobpilot-cvs">x3</p>
               <p className="mt-1 text-xs font-medium text-slate-500">Plus de retours recruteurs</p>
             </div>
             <div>
@@ -204,7 +204,7 @@ export default function WelcomePage() {
               <p className="mt-1 text-xs font-medium text-slate-500">Capture d'offres en ligne</p>
             </div>
             <div>
-              <p className="text-3xl font-extrabold text-indigo-600">100%</p>
+              <p className="text-3xl font-extrabold text-purple-600">100%</p>
               <p className="mt-1 text-xs font-medium text-slate-500">Contrôle sur vos données</p>
             </div>
           </div>

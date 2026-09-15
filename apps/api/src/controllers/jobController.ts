@@ -37,13 +37,31 @@ export async function listJobs(
     return;
   }
 
-  const jobs = await prisma.job.findMany({
-    orderBy: [{ retrievedAt: 'desc' }],
-    where: { status: 'PUBLISHED' },
-    take: 50,
-  });
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+  const skip = (page - 1) * limit;
 
-  res.status(200).json({ jobs: jobs.map(toJobResponse) });
+  const where = { status: 'PUBLISHED' as const };
+
+  const [jobs, total] = await Promise.all([
+    prisma.job.findMany({
+      orderBy: [{ retrievedAt: 'desc' }],
+      where,
+      skip,
+      take: limit,
+    }),
+    prisma.job.count({ where }),
+  ]);
+
+  res.status(200).json({
+    jobs: jobs.map(toJobResponse),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    },
+  });
 }
 
 export async function createJob(
@@ -94,19 +112,36 @@ export async function listMyJobs(
     return;
   }
 
-  const jobs = await prisma.job.findMany({
-    where: { postedByUserId: req.userId },
-    orderBy: [{ retrievedAt: 'desc' }],
-    include: {
-      _count: { select: { applications: true } },
-    },
-  });
+  const page = Math.max(1, parseInt(req.query.page as string) || 1);
+  const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+  const skip = (page - 1) * limit;
+
+  const where = { postedByUserId: req.userId };
+
+  const [jobs, total] = await Promise.all([
+    prisma.job.findMany({
+      where,
+      orderBy: [{ retrievedAt: 'desc' }],
+      include: {
+        _count: { select: { applications: true } },
+      },
+      skip,
+      take: limit,
+    }),
+    prisma.job.count({ where }),
+  ]);
 
   res.status(200).json({
     jobs: jobs.map((job) => ({
       ...toJobResponse(job),
       applicationsCount: job._count.applications,
     })),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    },
   });
 }
 

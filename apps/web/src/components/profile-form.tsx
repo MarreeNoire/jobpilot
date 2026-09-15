@@ -45,7 +45,7 @@ export function ProfileForm({ profile, action }: ProfileFormProps) {
             <Briefcase className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">Rôle & Niveau d'expérience</h2>
+            <h2 className="font-serif text-base font-semibold text-slate-900">Rôle & Niveau d'expérience</h2>
             <p className="text-xs text-slate-500">Ces informations qualifient votre profil pour le moteur de matching.</p>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function ProfileForm({ profile, action }: ProfileFormProps) {
             <Clock className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">Disponibilité</h2>
+            <h2 className="font-serif text-base font-semibold text-slate-900">Disponibilité</h2>
             <p className="text-xs text-slate-500">Précisez votre délai de prise de poste pour les recruteurs.</p>
           </div>
         </div>
@@ -138,11 +138,11 @@ export function ProfileForm({ profile, action }: ProfileFormProps) {
               <FileText className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">Résumé professionnel / Pitch</h2>
+              <h2 className="font-serif text-base font-semibold text-slate-900">Résumé professionnel / Pitch</h2>
               <p className="text-xs text-slate-500">Synthèse de votre parcours utilisée par l'IA pour vos candidatures.</p>
             </div>
           </div>
-          <span className="text-xs font-mono text-slate-400">{summary.length} caractères</span>
+          <span className="docket">{summary.length} caractères</span>
         </div>
 
         <div className="mt-6 space-y-3">

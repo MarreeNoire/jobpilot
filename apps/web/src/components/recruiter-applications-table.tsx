@@ -44,6 +44,8 @@ export function RecruiterApplicationsTable({ applications, initialStatus = 'ALL'
       : 'ALL',
   );
   const [sort, setSort] = useState<SortKey>('updatedAt');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const filteredApplications = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -74,6 +76,9 @@ export function RecruiterApplicationsTable({ applications, initialStatus = 'ALL'
       });
   }, [applications, query, sort, status]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredApplications.length / PAGE_SIZE));
+  const paginatedApplications = filteredApplications.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <section className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -89,7 +94,7 @@ export function RecruiterApplicationsTable({ applications, initialStatus = 'ALL'
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => { setPage(1); setQuery(event.target.value); }}
               placeholder="Candidat, poste, entreprise..."
               className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-xs text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
             />
@@ -99,7 +104,7 @@ export function RecruiterApplicationsTable({ applications, initialStatus = 'ALL'
             <Filter className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <select
               value={status}
-              onChange={(event) => setStatus(event.target.value as StatusFilter)}
+              onChange={(event) => { setPage(1); setStatus(event.target.value as StatusFilter); }}
               className="h-full w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-8 pr-7 text-xs font-medium text-slate-700 outline-none focus:border-blue-400 focus:bg-white"
             >
               <option value="ALL">Tous les statuts</option>

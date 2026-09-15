@@ -118,7 +118,7 @@ export default async function CandidateDetailPage({
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 text-2xl font-bold text-white shadow-md">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-jobpilot-primary to-jobpilot-cvs text-2xl font-bold text-white shadow-md">
                     {initials}
                   </div>
                   <div>

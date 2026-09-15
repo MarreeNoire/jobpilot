@@ -477,7 +477,7 @@ export function JobManager({ jobs, userRole, preferences }: JobManagerProps) {
             )}
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-6 sm:grid-cols-2">
             {filteredJobs.map((job) => {
               const isExpanded = expandedDescriptions[job.id];
               const companyInitial = job.company?.[0]?.toUpperCase() || 'E';

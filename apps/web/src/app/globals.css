@@ -1,19 +1,84 @@
 @import "tailwindcss";
 
+/*
+  Identité JobPilot — "Éditorial chaleureux"
+  On redéfinit les palettes Tailwind existantes (slate/blue/indigo/purple)
+  avec des valeurs chaudes. Comme tous les composants utilisent déjà ces
+  noms de classes (bg-blue-600, text-slate-900, etc.), toute l'app hérite
+  du nouveau style sans qu'on ait à modifier chaque fichier.
+*/
+@theme {
+  --font-sans: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* slate -> gris chauds (fond crème / texte encre) */
+  --color-slate-50: #fbf7f0;
+  --color-slate-100: #f5eee1;
+  --color-slate-200: #e8dfce;
+  --color-slate-300: #d8cbaf;
+  --color-slate-400: #b5a78c;
+  --color-slate-500: #94836a;
+  --color-slate-600: #756550;
+  --color-slate-700: #5a4d3c;
+  --color-slate-800: #3e342a;
+  --color-slate-900: #2b2420;
+  --color-slate-950: #1c1812;
+
+  /* blue (couleur d'action principale) -> vert forêt lumineux */
+  --color-blue-50: #eff7f0;
+  --color-blue-100: #dceede;
+  --color-blue-200: #b8dcbc;
+  --color-blue-300: #8fc696;
+  --color-blue-400: #63ac6c;
+  --color-blue-500: #429150;
+  --color-blue-600: #2f7a3e;
+  --color-blue-700: #256231;
+  --color-blue-800: #1f4e29;
+  --color-blue-900: #1a3f22;
+  --color-blue-950: #0e2412;
+
+  /* indigo (accent secondaire) -> vert sarcelle, même famille que le vert principal */
+  --color-indigo-50: #eef7f5;
+  --color-indigo-100: #d3ede6;
+  --color-indigo-200: #a7dbcc;
+  --color-indigo-300: #78c4af;
+  --color-indigo-400: #4ea98f;
+  --color-indigo-500: #358972;
+  --color-indigo-600: #256f5c;
+  --color-indigo-700: #1d5a4a;
+  --color-indigo-800: #18473b;
+  --color-indigo-900: #14392f;
+  --color-indigo-950: #0b211c;
+
+  /* purple (CVs / lettres de motivation) -> vert pin foncé, même famille */
+  --color-purple-50: #eef3ee;
+  --color-purple-100: #d6e3d6;
+  --color-purple-200: #adc8ad;
+  --color-purple-300: #82a882;
+  --color-purple-400: #5d8a5d;
+  --color-purple-500: #3f6d40;
+  --color-purple-600: #2c5230;
+  --color-purple-700: #234026;
+  --color-purple-800: #1c331f;
+  --color-purple-900: #172919;
+  --color-purple-950: #0d170e;
+}
+
 @layer base {
   :root {
-    --background: 248 250 252;
-    --foreground: 15 23 42;
+    --background: 251 247 240;
+    --foreground: 43 36 32;
     --card: 255 255 255;
-    --card-foreground: 15 23 42;
-    --primary: 37 99 235;
+    --card-foreground: 43 36 32;
+    --primary: 47 122 62;
     --primary-foreground: 255 255 255;
-    --border: 226 232 240;
+    --border: 232 223 206;
   }
 
   body {
-    color: rgb(15 23 42);
-    background-color: #f8fafc;
+    color: rgb(43 36 32);
+    background-color: #fbf7f0;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -27,14 +92,84 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f5eee1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d8cbaf;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #b5a78c;
+}
+
+/*
+  Composant signature : badge "tampon encreur".
+  Utilisé pour tous les statuts (candidature, offre, pipeline recruteur)
+  à la place d'un badge pilule classique — renforce l'idée de dossier
+  officiel qui progresse dans un processus.
+  Usage : <span class="stamp stamp-green">Envoyée</span>
+*/
+@layer components {
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.375rem;
+    border-width: 1.5px;
+    border-style: solid;
+    transform: rotate(-1.5deg);
+    background-color: transparent;
+  }
+
+  .stamp-green {
+    color: var(--color-blue-700);
+    border-color: var(--color-blue-600);
+    background-color: var(--color-blue-50);
+  }
+
+  .stamp-teal {
+    color: var(--color-indigo-700);
+    border-color: var(--color-indigo-600);
+    background-color: var(--color-indigo-50);
+  }
+
+  .stamp-pine {
+    color: var(--color-purple-700);
+    border-color: var(--color-purple-600);
+    background-color: var(--color-purple-50);
+  }
+
+  .stamp-amber {
+    color: var(--color-amber-700);
+    border-color: var(--color-amber-500);
+    background-color: var(--color-amber-50);
+  }
+
+  .stamp-red {
+    color: #9a3412;
+    border-color: #c2410c;
+    background-color: #fff1e6;
+  }
+
+  .stamp-neutral {
+    color: var(--color-slate-600);
+    border-color: var(--color-slate-400);
+    background-color: var(--color-slate-100);
+  }
+
+  /* Numéro de dossier / référence, style ledger */
+  .docket {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.05em;
+    color: var(--color-slate-500);
+  }
 }

@@ -117,7 +117,7 @@ export function JobPreferencesForm({
             <Briefcase className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">Postes & Métiers Cibles</h2>
+            <h2 className="font-serif text-base font-semibold text-slate-900">Postes & Métiers Cibles</h2>
             <p className="text-xs text-slate-500">
               Séparez chaque intitulé par une virgule pour que l'IA détecte précisément vos opportunités.
             </p>
@@ -174,7 +174,7 @@ export function JobPreferencesForm({
             <MapPin className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">Localisation & Modalités de travail</h2>
+            <h2 className="font-serif text-base font-semibold text-slate-900">Localisation & Modalités de travail</h2>
             <p className="text-xs text-slate-500">Précisez vos zones géographiques et votre ouverture au remote.</p>
           </div>
         </div>
@@ -256,7 +256,7 @@ export function JobPreferencesForm({
             <Banknote className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">Rémunération minimale souhaitée</h2>
+            <h2 className="font-serif text-base font-semibold text-slate-900">Rémunération minimale souhaitée</h2>
             <p className="text-xs text-slate-500">Filtrera les offres qui ne correspondent pas à vos attentes financières.</p>
           </div>
         </div>
@@ -296,7 +296,7 @@ export function JobPreferencesForm({
             <Building2 className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">Types de contrat & Secteurs d'activité</h2>
+            <h2 className="font-serif text-base font-semibold text-slate-900">Types de contrat & Secteurs d'activité</h2>
             <p className="text-xs text-slate-500">Ciblez les environnements et structures dans lesquels vous souhaitez évoluer.</p>
           </div>
         </div>

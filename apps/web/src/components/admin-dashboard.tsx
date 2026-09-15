@@ -20,7 +20,9 @@ import {
   MoreVertical,
   Trash2,
   Edit,
-  Eye
+  Eye,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface AdminStats {
@@ -69,6 +71,8 @@ export function AdminDashboard({ token, user }: AdminDashboardProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -137,6 +141,8 @@ export function AdminDashboard({ token, user }: AdminDashboardProps) {
 
       const usersData = await usersResponse.json();
       setUsers(usersData.users);
+      setTotalPages(usersData.pagination?.totalPages ?? 1);
+      setTotalUsers(usersData.pagination?.total ?? usersData.users.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -353,14 +359,20 @@ export function AdminDashboard({ token, user }: AdminDashboardProps) {
                   type="text"
                   placeholder="Rechercher..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setCurrentPage(1);
+                    setSearchTerm(e.target.value);
+                  }}
                   className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
               
               <select
                 value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                onChange={(e) => {
+                  setCurrentPage(1);
+                  setRoleFilter(e.target.value);
+                }}
                 className="rounded-xl border border-slate-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="ALL">Tous les rôles</option>
@@ -450,6 +462,34 @@ export function AdminDashboard({ token, user }: AdminDashboardProps) {
           <div className="p-8 text-center">
             <Users className="mx-auto h-12 w-12 text-slate-300" />
             <p className="mt-2 text-sm text-slate-600">Aucun utilisateur trouvé</p>
+          </div>
+        )}
+
+        {totalUsers > 0 && (
+          <div className="flex flex-col gap-3 border-t border-slate-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="docket">
+              {totalUsers} utilisateur{totalUsers > 1 ? 's' : ''} au total — page {currentPage} sur {totalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                Précédent
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Suivant
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </section>

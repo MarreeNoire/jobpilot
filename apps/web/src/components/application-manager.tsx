@@ -56,6 +56,8 @@ export function ApplicationManager({ applications, jobs, resumes }: ApplicationM
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'ALL' | Application['status']>('ALL');
   const [sourceFilter, setSourceFilter] = useState<'ALL' | 'AUTOMATIC' | 'MANUAL'>('ALL');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 8;
   const filteredApplications = useMemo(
     () => applications.filter((application) =>
       (statusFilter === 'ALL' || application.status === statusFilter) &&
@@ -63,6 +65,8 @@ export function ApplicationManager({ applications, jobs, resumes }: ApplicationM
     ),
     [applications, sourceFilter, statusFilter]
   );
+  const totalPages = Math.max(1, Math.ceil(filteredApplications.length / PAGE_SIZE));
+  const paginatedApplications = filteredApplications.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const statusSummary = useMemo(() => ({
     total: applications.length,
     active: applications.filter((application) => ['SUBMITTED', 'REVIEWING', 'SHORTLISTED', 'INTERVIEW_SCHEDULED', 'INTERVIEW'].includes(application.status)).length,
@@ -194,7 +198,7 @@ export function ApplicationManager({ applications, jobs, resumes }: ApplicationM
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500"><Filter className="h-3.5 w-3.5" /> Filtrer</span>
             <label className="relative">
               <span className="sr-only">Filtrer par statut</span>
-              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)} className="min-h-10 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-8 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+              <select value={statusFilter} onChange={(event) => { setPage(1); setStatusFilter(event.target.value as typeof statusFilter); }} className="min-h-10 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-8 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
                 <option value="ALL">Tous les statuts</option>
                 {applicationStatuses.map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}
               </select>
@@ -202,7 +206,7 @@ export function ApplicationManager({ applications, jobs, resumes }: ApplicationM
             </label>
             <label className="relative">
               <span className="sr-only">Filtrer par origine</span>
-              <select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value as typeof sourceFilter)} className="min-h-10 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-8 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+              <select value={sourceFilter} onChange={(event) => { setPage(1); setSourceFilter(event.target.value as typeof sourceFilter); }} className="min-h-10 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-8 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
                 <option value="ALL">Toutes les sources</option>
                 <option value="MANUAL">Manuelles</option>
                 <option value="AUTOMATIC">Automatiques</option>
@@ -216,7 +220,7 @@ export function ApplicationManager({ applications, jobs, resumes }: ApplicationM
           {filteredApplications.length === 0 ? (
             <p className="text-sm text-slate-600">Aucune candidature enregistrée pour le moment.</p>
           ) : (
-            filteredApplications.map((application) => (
+            paginatedApplications.map((application) => (
               <div key={application.id} className="rounded-xl border border-slate-200 p-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
@@ -265,6 +269,30 @@ export function ApplicationManager({ applications, jobs, resumes }: ApplicationM
             ))
           )}
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p className="docket">Page {page} sur {totalPages}</p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Précédent
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );

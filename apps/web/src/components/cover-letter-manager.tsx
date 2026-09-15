@@ -100,7 +100,7 @@ function CoverLetterCard({ cl }: { cl: CoverLetter }) {
   if (editing) {
     return (
       <div className="rounded-3xl border border-blue-200 bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-sm font-bold text-slate-900">Modifier : {cl.title}</h3>
+        <h3 className="mb-4 font-serif text-sm font-semibold text-slate-900">Modifier : {cl.title}</h3>
         <CoverLetterForm initial={cl} onClose={() => setEditing(false)} />
       </div>
     );
@@ -115,14 +115,14 @@ function CoverLetterCard({ cl }: { cl: CoverLetter }) {
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-bold text-slate-900">{cl.title}</h3>
+              <h3 className="font-serif text-sm font-semibold text-slate-900">{cl.title}</h3>
               {cl.isPrimary && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-semibold text-purple-700">
+                <span className="stamp stamp-pine">
                   <Star className="h-3 w-3" /> Principale
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="docket">
               {new Date(cl.updatedAt).toLocaleDateString('fr-FR')} · {cl.content.length} caractères
             </p>
           </div>
@@ -185,7 +185,7 @@ export function CoverLetterManager({ coverLetters }: { coverLetters: CoverLetter
       {/* Formulaire de création */}
       {showForm && (
         <div className="rounded-3xl border border-purple-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 text-base font-bold text-slate-900">Nouvelle lettre de motivation</h2>
+          <h2 className="mb-5 font-serif text-base font-semibold text-slate-900">Nouvelle lettre de motivation</h2>
           <CoverLetterForm onClose={() => setShowForm(false)} />
         </div>
       )}

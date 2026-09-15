@@ -32,12 +32,12 @@ export default async function DashboardPage() {
         <div className="mx-auto flex max-w-6xl flex-col gap-6">
           <DashboardHeader user={user} />
           <DashboardNav role={user.role} />
-          <div className="rounded-2xl border border-purple-200 bg-purple-50 p-6 text-center">
-            <h2 className="text-xl font-bold text-purple-900">Espace Administrateur</h2>
-            <p className="mt-2 text-sm text-purple-700">Vous êtes connecté en tant qu'administrateur.</p>
-            <a 
-              href="/dashboard/admin" 
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-purple-700 transition"
+          <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-6 text-center">
+            <h2 className="font-serif text-xl font-semibold text-blue-900">Espace Administrateur</h2>
+            <p className="mt-2 text-sm text-blue-800/70">Vous êtes connecté en tant qu'administrateur.</p>
+            <a
+              href="/dashboard/admin"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
             >
               Accéder au dashboard admin
             </a>
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
 
         {/* Personalized Welcome Banner */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-8 text-white shadow-lg shadow-blue-500/10">
-          <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
+          <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/5 blur-2xl" />
 
           <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
@@ -87,10 +87,10 @@ export default async function DashboardPage() {
                 <Sparkles className="h-3.5 w-3.5 text-yellow-300" />
                 <span>Espace de pilotage intelligent</span>
               </div>
-              <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
                 Bonjour {user.firstName} 👋
               </h1>
-              <p className="mt-2 max-w-xl text-blue-100 text-sm sm:text-base leading-relaxed">
+              <p className="mt-2 max-w-xl text-blue-50 text-sm sm:text-base leading-relaxed">
                 Configurez votre profil et vos critères pour permettre à l'IA d'analyser vos offres et d'optimiser chacune de vos candidatures.
               </p>
             </div>
@@ -106,7 +106,7 @@ export default async function DashboardPage() {
                   <p className="text-sm font-semibold text-white">
                     Votre espace JobPilot est prêt.
                   </p>
-                  <p className="text-[11px] leading-relaxed text-blue-100">
+                  <p className="text-[11px] leading-relaxed text-blue-50">
                     Vous pouvez maintenant passer à la gestion active de vos offres et candidatures.
                   </p>
                 </div>
@@ -114,15 +114,20 @@ export default async function DashboardPage() {
                 <>
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <span>Préparation du profil</span>
-                    <span className="text-yellow-300">{onboarding.progressPercent}%</span>
+                    <span className="text-yellow-400">{onboarding.progressPercent}%</span>
                   </div>
                   <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-white/20">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-emerald-400 transition-all duration-500"
+                      className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-emerald-400 transition-all duration-1000 ease-in-out"
                       style={{ width: `${onboarding.progressPercent}%` }}
-                    />
+                    >
+                      {/* Ajouter des markers pour chaque étape */}
+                      {onboarding.steps.map((step, index) => (
+                        <div key={index} className="absolute left-[calc(${step.completed ? (onboarding.progressPercent * 100 / onboarding.totalCount) : 0}%) -1px] top-[-2px] h-[4px] w-[2px] bg-white rounded" />
+                      ))}
+                    </div>
                   </div>
-                  <p className="mt-2 text-[11px] text-blue-200">
+                  <p className="mt-2 text-[11px] text-blue-50">
                     {onboarding.completedCount} sur {onboarding.totalCount} étapes complétées
                   </p>
                 </>
@@ -133,7 +138,7 @@ export default async function DashboardPage() {
 
         {/* Key KPI Stats */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Offres suivies</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -142,11 +147,11 @@ export default async function DashboardPage() {
             </div>
             <p className="mt-3 text-3xl font-bold text-slate-900">{data.jobs.length}</p>
             <p className="mt-1 text-xs text-slate-500">
-              {data.jobs.length > 0 ? 'Offres dans votre pipeline' : 'Aucune offre enregistrée'}
+              {data.jobs.length > 0 ? 'Offres dans votre pipeline' : '🔍 Commencez par ajouter votre première offre'}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">CVs enregistrés</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
@@ -155,11 +160,11 @@ export default async function DashboardPage() {
             </div>
             <p className="mt-3 text-3xl font-bold text-slate-900">{data.resumes.length}</p>
             <p className="mt-1 text-xs text-slate-500">
-              {hasPrimaryResume ? '✓ CV principal actif' : 'Aucun CV principal défini'}
+              {hasPrimaryResume ? '✓ CV principal actif' : '📄 Importez votre premier CV pour commencer'}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Critères cibles</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
@@ -174,7 +179,7 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Statut profil</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
@@ -195,7 +200,7 @@ export default async function DashboardPage() {
           <section className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
             <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-bold tracking-tight text-slate-900">
+                <h2 className="font-serif text-xl font-semibold tracking-tight text-slate-900">
                   Résumé de votre configuration
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -213,8 +218,8 @@ export default async function DashboardPage() {
                 <p className="mt-3 text-sm text-slate-700">
                   {data.profile?.title || 'Profil configuré'}
                 </p>
-                <Link href="/dashboard/profile" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
-                  Modifier <ArrowRight className="h-3 w-3" />
+                <Link href="/dashboard/profile" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200">
+                  Modifier <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-x-0.5" />
                 </Link>
               </div>
 
@@ -226,8 +231,8 @@ export default async function DashboardPage() {
                 <p className="mt-3 text-sm text-slate-700">
                   {data.preference?.jobTitles?.[0] || 'Critères enregistrés'}
                 </p>
-                <Link href="/dashboard/preferences" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
-                  Ajuster <ArrowRight className="h-3 w-3" />
+                <Link href="/dashboard/preferences" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200">
+                  Ajuster <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-x-0.5" />
                 </Link>
               </div>
 
@@ -239,8 +244,8 @@ export default async function DashboardPage() {
                 <p className="mt-3 text-sm text-slate-700">
                   {data.resumes.length} document{data.resumes.length > 1 ? 's' : ''} disponible{data.resumes.length > 1 ? 's' : ''}
                 </p>
-                <Link href="/dashboard/resumes" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
-                  Gérer <ArrowRight className="h-3 w-3" />
+                <Link href="/dashboard/resumes" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200">
+                  Gérer <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-x-0.5" />
                 </Link>
               </div>
 
@@ -262,7 +267,7 @@ export default async function DashboardPage() {
           <section className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
             <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-bold tracking-tight text-slate-900">
+                <h2 className="font-serif text-xl font-semibold tracking-tight text-slate-900">
                   Parcours d’optimisation recommandé
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -277,7 +282,7 @@ export default async function DashboardPage() {
               }`}>
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">Étape 1</span>
+                    <span className="stamp stamp-green">Étape 1</span>
                     {onboarding.steps[0]?.completed ? (
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
                         <CheckCircle2 className="h-4 w-4" /> Renseigné
@@ -306,7 +311,7 @@ export default async function DashboardPage() {
               }`}>
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700">Étape 2</span>
+                    <span className="stamp stamp-teal">Étape 2</span>
                     {onboarding.steps[1]?.completed ? (
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
                         <CheckCircle2 className="h-4 w-4" /> Défini
@@ -335,7 +340,7 @@ export default async function DashboardPage() {
               }`}>
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-purple-100 px-2 py-0.5 text-xs font-bold text-purple-700">Étape 3</span>
+                    <span className="stamp stamp-pine">Étape 3</span>
                     {onboarding.steps[2]?.completed ? (
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
                         <CheckCircle2 className="h-4 w-4" /> {data.resumes.length} CV(s)
@@ -364,7 +369,7 @@ export default async function DashboardPage() {
               }`}>
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">Étape 4</span>
+                    <span className="stamp stamp-amber">Étape 4</span>
                     {onboarding.steps[3]?.completed ? (
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
                         <CheckCircle2 className="h-4 w-4" /> {data.jobs.length} Offre(s)
@@ -400,7 +405,7 @@ export default async function DashboardPage() {
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     <span>Setup complete</span>
                   </div>
-                  <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">
+                  <h2 className="mt-3 font-serif text-2xl font-semibold tracking-tight text-slate-900">
                     Votre espace est prêt
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm text-slate-700">
