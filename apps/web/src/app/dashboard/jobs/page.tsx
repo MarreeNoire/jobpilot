@@ -46,7 +46,7 @@ async function getJobs(role: UserRole, page: number): Promise<{ jobs: Job[]; tot
 
   const endpoint = role === 'RECRUITER' ? '/api/jobs/mine' : '/api/jobs';
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}?page=${page}&limit=5`, {
+  const response = await fetch(`${API_BASE_URL}${endpoint}?page=${page}&limit=4`, {
     headers: {
       Cookie: `jobpilot_token=${token}`,
     },
@@ -116,7 +116,7 @@ export default async function JobsPage({
           </Link>
         </div>
 
-        <JobManager jobs={jobs} userRole={user.role} preferences={preferences} />
+        <JobManager jobs={jobs} userRole={user.role} preferences={preferences} total={total} />
 
         {totalPages > 1 && (
           <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">

@@ -35,6 +35,7 @@ interface JobManagerProps {
   jobs: Job[];
   userRole: UserRole;
   preferences?: CandidatePreferences | null;
+  total: number;
 }
 
 const initialState: JobFormState = {};
@@ -47,7 +48,7 @@ const platformPresets = [
   { id: 'autre', label: 'Autre', color: 'bg-slate-100 text-slate-800 border-slate-200' },
 ];
 
-export function JobManager({ jobs, userRole, preferences }: JobManagerProps) {
+export function JobManager({ jobs, userRole, preferences, total }: JobManagerProps) {
   const isRecruiter = userRole === 'RECRUITER';
   const router = useRouter();
   const [statusPending, startStatusTransition] = useTransition();
@@ -156,7 +157,7 @@ export function JobManager({ jobs, userRole, preferences }: JobManagerProps) {
     <div className="space-y-5">
       <section className="grid gap-3 sm:grid-cols-3">
         {[
-          { label: isRecruiter ? 'Offres publiées' : 'Opportunités', value: isRecruiter ? activeRecruiterJobs.length : jobs.length, tone: 'blue' },
+          { label: isRecruiter ? 'Offres publiées' : 'Opportunités', value: isRecruiter ? activeRecruiterJobs.length : total, tone: 'blue' },
           { label: isRecruiter ? 'Candidatures reçues' : 'Correspondances fortes', value: isRecruiter ? activeRecruiterJobs.reduce((sum, job) => sum + (job.applicationsCount ?? 0), 0) : matchingJobs, tone: 'violet' },
           { label: isRecruiter ? 'À surveiller' : 'Télétravail', value: isRecruiter ? activeRecruiterJobs.filter((job) => (job.applicationsCount ?? 0) === 0).length : remoteJobs.length, tone: 'emerald' },
         ].map(({ label, value, tone }) => (
