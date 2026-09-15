@@ -9,19 +9,19 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "start": "turbo run start",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
+    "dev": "npx turbo run dev",
+    "build": "npx turbo run build",
+    "start": "npx turbo run start",
+    "test": "npx turbo run test",
+    "lint": "npx turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "turbo": "^2.0.0",
-    "typescript": "^5.4.0"
+    "prettier": "^3.2.5"
   },
   "dependencies": {
-    "kimi-cli": "^0.0.2"
+    "kimi-cli": "^0.0.2",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
   }
 }
