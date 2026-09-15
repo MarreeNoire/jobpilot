@@ -10,7 +10,9 @@
   ],
   "scripts": {
     "dev": "npx turbo run dev",
-    "build": "npx turbo run build",
+    "build": "npx turbo run build --filter=!extension",
+    "build:api": "npx turbo run build --filter=api...",
+    "build:web": "npx turbo run build --filter=web...",
     "start": "npx turbo run start",
     "test": "npx turbo run test",
     "lint": "npx turbo run lint",
