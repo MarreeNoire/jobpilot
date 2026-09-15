@@ -2,12 +2,12 @@ services:
   - type: web
     name: jobpilot-web
     env: node
-    buildCommand: npm install && npm run build --workspace=apps/web
+    buildCommand: npm install && echo "Node version: $(node -v)" && echo "Installed workspace packages:" && npx ls workspace --parseable && npm run build --workspace=apps/web
     startCommand: npm run start --workspace=apps/web
     staticPublishPath: .next
 
   - type: web
     name: jobpilot-api
     env: node
-    buildCommand: npm install && npm run build --workspace=apps/api
+    buildCommand: npm install && echo "Node version: $(node -v)" && echo "Installed workspace packages:" && npx ls workspace --parseable && npm run build --workspace=apps/api
     startCommand: npm run start --workspace=apps/api
