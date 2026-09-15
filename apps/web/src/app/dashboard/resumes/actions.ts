@@ -11,6 +11,7 @@ export interface Resume {
   fileUrl: string | null;
   fileName?: string | null;
   fileMimeType?: string | null;
+  fileContent?: string | null;
   hasUploadedFile?: boolean;
   isPrimary: boolean;
   createdAt: string;

@@ -7,6 +7,7 @@ import {
   deleteResumeAction,
   setPrimaryResumeAction,
 } from '@/app/dashboard/resumes/actions';
+import { PdfViewerModal } from '@/components/pdf-viewer-modal';
 import {
   AlertCircle,
   CheckCircle2,
@@ -258,13 +259,13 @@ export function ResumeManager({ resumes }: ResumeManagerProps) {
                       ) : null}
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                       {resume.fileUrl ? (
                         <a
                           href={resume.fileUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 truncate max-w-full"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 truncate max-w-[220px]"
                         >
                           <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                           <span className="truncate">{resume.fileUrl}</span>
@@ -277,6 +278,12 @@ export function ResumeManager({ resumes }: ResumeManagerProps) {
                       ) : (
                         <span className="text-xs text-slate-400">Aucun lien ni fichier enregistré</span>
                       )}
+
+                      <PdfViewerModal
+                        title={resume.title}
+                        fileUrl={resume.fileUrl}
+                        fileContent={resume.fileContent}
+                      />
                     </div>
                   </div>
 

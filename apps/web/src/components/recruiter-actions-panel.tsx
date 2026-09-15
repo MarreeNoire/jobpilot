@@ -10,6 +10,7 @@ import {
 } from '@/app/dashboard/jobs/[id]/applications/actions';
 import type { Application } from '@/app/dashboard/applications/actions';
 import type { RecruiterInterview } from '@/app/dashboard/jobs/[id]/applications/actions';
+import { CalendarExportButton } from '@/components/calendar-export-button';
 import { CalendarDays, CheckCircle2, Loader2, MessageSquare, Send, Video } from 'lucide-react';
 
 type PipelineStatus = 'PENDING' | 'REVIEWING' | 'SHORTLISTED' | 'INTERVIEW_SCHEDULED' | 'ACCEPTED' | 'REJECTED';
@@ -181,6 +182,16 @@ export function RecruiterActionsPanel({
                   </a>
                 )}
                 {interview.notes && <p className="mt-1 whitespace-pre-wrap text-slate-600">{interview.notes}</p>}
+                <div className="mt-2.5 pt-2 border-t border-indigo-50">
+                  <CalendarExportButton
+                    title="Entretien recrutement"
+                    scheduledAt={interview.scheduledAt}
+                    timezone={interview.timezone}
+                    mode={interview.mode}
+                    meetingUrl={interview.meetingUrl}
+                    notes={interview.notes}
+                  />
+                </div>
               </div>
             ))}
           </div>
