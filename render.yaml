@@ -1,43 +1,69 @@
-# JobPilot - Deploiement Render (blueprint)
-# Base de donnees : Supabase PostgreSQL (deja utilisee par le projet, voir .env)
 services:
-  # API Express (apps/api)
+  # ---------------------------------------------------
+  # 1. API Backend Service (Express + Prisma)
+  # ---------------------------------------------------
   - type: web
     name: jobpilot-api
-    runtime: node
+    env: node
     plan: free
-    buildCommand: npm ci && npm run build
-    startCommand: node apps/api/dist/apps/api/src/server.js
-    healthCheckPath: /health
+    region: frankfurt
+    buildCommand: npm install && npx prisma db push --schema=packages/database/prisma/schema.prisma && npm run build
+    startCommand: npm run start --workspace=apps/api
     envVars:
       - key: NODE_ENV
         value: production
-      - key: FRONTEND_URL
-        value: https://jobpilot-web.onrender.com
+      - key: PORT
+        value: 10000
       - key: DATABASE_URL
-        sync: false # a renseigner dans le tableau de bord Render (Supabase, pooler 6543)
+        fromDatabase:
+          name: jobpilot-db
+          property: connectionString
       - key: DIRECT_URL
-        sync: false # a renseigner dans le tableau de bord Render (Supabase, port 5432)
+        fromDatabase:
+          name: jobpilot-db
+          property: connectionString
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: jobpilot-web
+          property: url
       - key: AUTH_SECRET
-        sync: false # a renseigner dans le tableau de bord Render
-      - key: STORAGE_ENDPOINT
-        sync: false
-      - key: STORAGE_BUCKET
-        sync: false
-      - key: STORAGE_ACCESS_KEY
-        sync: false
-      - key: STORAGE_SECRET_KEY
-        sync: false
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
 
-  # Frontend Next.js (apps/web)
+  # ---------------------------------------------------
+  # 2. Frontend Web Service (Next.js)
+  # ---------------------------------------------------
   - type: web
     name: jobpilot-web
-    runtime: node
+    env: node
     plan: free
-    buildCommand: npm ci && npm run build --workspace=apps/web
-    startCommand: cd apps/web && npx next start -p $PORT
+    region: frankfurt
+    buildCommand: npm install && npm run build
+    startCommand: npm run start --workspace=apps/web
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
       - key: NEXT_PUBLIC_API_URL
-        value: https://jobpilot-api.onrender.com
+        fromService:
+          type: web
+          name: jobpilot-api
+          property: url
+      - key: NEXT_PUBLIC_APP_URL
+        fromService:
+          type: web
+          name: jobpilot-web
+          property: url
+
+databases:
+  # ---------------------------------------------------
+  # 3. PostgreSQL Database Service
+  # ---------------------------------------------------
+  - name: jobpilot-db
+    databaseName: jobpilot
+    user: jobpilot
+    plan: free
+    region: frankfurt

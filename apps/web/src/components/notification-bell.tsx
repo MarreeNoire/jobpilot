@@ -75,7 +75,7 @@ export function NotificationBell({ initialNotifications, initialUnreadCount }: N
   function handleNotificationClick(notification: AppNotification) {
     setOpen(false);
 
-    const target = notification.link ?? '/dashboard/notifications';
+    const target = `/dashboard/notifications/${notification.id}`;
 
     if (!notification.isRead) {
       setNotifications((prev) =>

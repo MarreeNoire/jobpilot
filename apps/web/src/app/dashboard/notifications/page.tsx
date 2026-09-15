@@ -6,9 +6,15 @@ import { getNotifications } from './actions';
 import { NotificationsList } from '@/components/notifications-list';
 import { ArrowLeft, Bell } from 'lucide-react';
 
-export default async function NotificationsPage() {
+export default async function NotificationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const user = await requireCurrentUser();
-  const { notifications, unreadCount } = await getNotifications();
+  const resolvedParams = await searchParams;
+  const currentPage = Math.max(1, parseInt(resolvedParams.page ?? '1') || 1);
+  const { notifications, unreadCount, totalPages, total } = await getNotifications(currentPage, 20);
 
   return (
     <main className="min-h-screen bg-slate-50/60 p-4 sm:p-8">
@@ -41,6 +47,34 @@ export default async function NotificationsPage() {
         </div>
 
         <NotificationsList initialNotifications={notifications} initialUnreadCount={unreadCount} />
+
+        {totalPages > 1 && (
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <p className="docket">
+              {total} notification{total > 1 ? 's' : ''} au total — page {currentPage} sur {totalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/dashboard/notifications?page=${Math.max(1, currentPage - 1)}`}
+                aria-disabled={currentPage <= 1}
+                className={`inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 ${
+                  currentPage <= 1 ? 'pointer-events-none opacity-40' : ''
+                }`}
+              >
+                Précédent
+              </Link>
+              <Link
+                href={`/dashboard/notifications?page=${Math.min(totalPages, currentPage + 1)}`}
+                aria-disabled={currentPage >= totalPages}
+                className={`inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 ${
+                  currentPage >= totalPages ? 'pointer-events-none opacity-40' : ''
+                }`}
+              >
+                Suivant
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

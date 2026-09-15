@@ -28,7 +28,7 @@ export function NotificationsList({ initialNotifications, initialUnreadCount }: 
   const [isPending, startTransition] = useTransition();
 
   function handleMarkRead(notification: AppNotification) {
-    const target = notification.link ?? '/dashboard/applications';
+    const target = `/dashboard/notifications/${notification.id}`;
 
     if (!notification.isRead) {
       setNotifications((prev) =>

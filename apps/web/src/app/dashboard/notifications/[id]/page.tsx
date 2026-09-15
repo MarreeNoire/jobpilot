@@ -4,7 +4,7 @@ import { DashboardHeader } from '@/components/dashboard-header';
 import { DashboardNav } from '@/components/dashboard-nav';
 import { getNotificationById, markNotificationReadAction } from '@/app/dashboard/notifications/actions';
 import { notFound } from 'next/navigation';
-import { Bell, CheckCircle2, Loader2, Mail, MapPin, Users, XCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bell, Briefcase, CheckCircle2, Loader2, Mail, MapPin, Users, XCircle } from 'lucide-react';
 
 export default async function NotificationDetailPage({
   params,
@@ -16,17 +16,13 @@ export default async function NotificationDetailPage({
 
   const notification = await getNotificationById(id);
 
-  // If notification not found or doesn't belong to user, show 404
-  if (!notification || notification.userId !== user.id) {
+  // If notification not found or doesn't belong to user (getNotificationById returns null), show 404
+  if (!notification) {
     notFound();
   }
 
-  // Mark as read when viewing the detail page
-  // We do this in background so it doesn't block UI
-  const [unreadCount] = await Promise.all([
-    markNotificationReadAction(id).catch(() => {}), // Ignore errors as we're already showing it
-    // We could fetch updated count here but it's not critical for UX
-  ]);
+  // Mark as read when viewing the detail page in background
+  markNotificationReadAction(id).catch(() => {});
 
   return (
     <main className="min-h-screen bg-slate-50/60 p-4 sm:p-8">
@@ -96,7 +92,7 @@ export default async function NotificationDetailPage({
             </div>
 
             {/* Action button if link exists */}
-            {notification.link && (
+            {notification.link && notification.link !== `/dashboard/notifications/${id}` && (
               <div className="mt-4">
                 <Link
                   href={notification.link.startsWith('/') ? notification.link : `/${notification.link}`}

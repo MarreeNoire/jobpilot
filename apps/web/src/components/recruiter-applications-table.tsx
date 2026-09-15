@@ -145,7 +145,7 @@ export function RecruiterApplicationsTable({ applications, initialStatus = 'ALL'
               </tr>
             </thead>
             <tbody>
-              {filteredApplications.map((application) => (
+              {paginatedApplications.map((application) => (
                 <tr key={application.id} className="rounded-xl bg-slate-50/70 text-sm transition hover:bg-blue-50/50">
                   <td className="rounded-l-xl px-3 py-3">
                     <p className="font-semibold text-slate-900">{application.candidate.firstName} {application.candidate.lastName}</p>
@@ -182,6 +182,30 @@ export function RecruiterApplicationsTable({ applications, initialStatus = 'ALL'
       <p className="mt-4 text-[11px] text-slate-400">
         Les changements de statut et les notifications se font depuis la fiche candidat afin d&apos;eviter les actions groupees accidentelles.
       </p>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="docket">Page {page} sur {totalPages}</p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Précédent
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Suivant
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
