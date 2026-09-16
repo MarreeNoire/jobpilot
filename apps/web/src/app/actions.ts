@@ -165,3 +165,56 @@ export async function logoutAction(): Promise<void> {
   cookieStore.delete('jobpilot_token');
   redirect('/login');
 }
+
+export interface OtpRequestState {
+  error?: string;
+}
+
+export async function requestOtpAction(
+  email: string,
+  role: AuthenticatedRole
+): Promise<OtpRequestState> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/otp/request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim(), role }),
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      return { error: await parseApiError(response) };
+    }
+
+    return {};
+  } catch (error) {
+    console.error('[auth] OTP request failed', error);
+    return { error: API_UNAVAILABLE_MESSAGE };
+  }
+}
+
+export async function verifyOtpAction(
+  email: string,
+  code: string
+): Promise<AuthFormState> {
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}/api/auth/otp/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim(), code }),
+      cache: 'no-store',
+    });
+  } catch (error) {
+    console.error('[auth] OTP verify failed', error);
+    return { error: API_UNAVAILABLE_MESSAGE };
+  }
+
+  if (!response.ok) {
+    return { error: await parseApiError(response) };
+  }
+
+  await persistSessionFromResponse(response);
+  return redirectToRoleDashboard(response);
+}

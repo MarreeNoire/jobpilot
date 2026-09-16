@@ -142,7 +142,7 @@ export default async function ApplyPage({
         )}
 
         <Link
-          href={`/dashboard/jobs/${jobId}`}
+          href={`/dashboard/jobs/${String(jobId)}`}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition"
         >
           <ArrowLeft className="h-3.5 w-3.5" />

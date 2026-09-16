@@ -99,6 +99,40 @@ function buildEmailHtml(
 }
 
 /**
+ * Helper to send an email to a recruiter (either from User relation or contactEmail)
+ */
+async function sendRecruiterEmail(
+  recruiter: { email: string; firstName: string },
+  params: { jobTitle: string; company: string; candidateName: string; jobId: string }
+) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+
+  const from = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+
+  try {
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from,
+      to: recruiter.email,
+      subject: `JobPilot — Nouvelle candidature pour "${params.jobTitle}"`,
+      html: buildEmailHtml(
+        recruiter.firstName,
+        `Nouvelle candidature reçue`,
+        `${params.candidateName} vient de postuler à votre offre <strong>${params.jobTitle}</strong> chez ${params.company}.<br><br>Consultez le profil du candidat et gérez le pipeline de recrutement depuis votre espace JobPilot.`,
+        appUrl,
+        `/dashboard/jobs/${params.jobId}/applications`,
+        'Voir les candidatures →'
+      ),
+    });
+    console.log(`[email] Recruteur notifié (${recruiter.email}) — nouvelle candidature pour "${params.jobTitle}"`);
+  } catch (err) {
+    console.error('[email] Erreur notification recruteur :', err);
+  }
+}
+
+/**
  * Notifie le recruteur qu'une nouvelle candidature vient d'être soumise
  * sur l'une de ses offres. Crée aussi une notification interne pour le candidat.
  */
@@ -128,40 +162,27 @@ export async function notifyNewApplication(params: {
     body: candidateBody,
   });
 
-  // Email au recruteur (uniquement si l'offre a un recruteur sur la plateforme)
-  if (!params.recruiterUserId) return;
-
-  const recruiter = await prisma.user.findUnique({
-    where: { id: params.recruiterUserId },
-    select: { email: true, firstName: true },
-  });
-
-  if (!recruiter) return;
-
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
-
-  const from = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-
-  try {
-    const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from,
-      to: recruiter.email,
-      subject: `JobPilot — Nouvelle candidature pour "${params.jobTitle}"`,
-      html: buildEmailHtml(
-        recruiter.firstName,
-        `Nouvelle candidature reçue`,
-        `${params.candidateName} vient de postuler à votre offre <strong>${params.jobTitle}</strong> chez ${params.company}.<br><br>Consultez le profil du candidat et gérez le pipeline de recrutement depuis votre espace JobPilot.`,
-        appUrl,
-        `/dashboard/jobs/${params.jobId}/applications`,
-        'Voir les candidatures →'
-      ),
+  // 1️⃣ Email au recruteur via la relation platform (si existant)
+  if (params.recruiterUserId) {
+    const recruiter = await prisma.user.findUnique({
+      where: { id: params.recruiterUserId },
+      select: { email: true, firstName: true },
     });
-    console.log(`[email] Recruteur notifié (${recruiter.email}) — nouvelle candidature pour "${params.jobTitle}"`);
-  } catch (err) {
-    console.error('[email] Erreur notification recruteur :', err);
+    if (recruiter) {
+      await sendRecruiterEmail(recruiter, params);
+    }
+  }
+
+  // 2️⃣ Email au recruteur via contactEmail (scraped/imported jobs)
+  const job = await prisma.job.findUnique({
+    where: { id: params.jobId },
+    select: { contactEmail: true, title: true, company: true },
+  });
+  if (job?.contactEmail) {
+    await sendRecruiterEmail(
+      { email: job.contactEmail, firstName: '' }, // firstName may be unknown
+      params
+    );
   }
 }
 

@@ -1,7 +1,9 @@
 import { AuthForm } from '@/components/auth-form';
+import { AlternateAuthMethods } from '@/components/alternate-auth-methods';
 import { ActiveSessionBanner } from '@/components/active-session-banner';
 import { registerAction } from '@/app/actions';
 import { getCurrentUser } from '@/lib/auth';
+import { API_BASE_URL } from '@/lib/api';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
 
@@ -157,6 +159,10 @@ export default async function RegisterPage({
               },
             ]}
           />
+
+          {selectedRole !== 'ADMIN' ? (
+            <AlternateAuthMethods role={selectedRole} apiBaseUrl={API_BASE_URL} />
+          ) : null}
         </div>
       </div>
     </main>

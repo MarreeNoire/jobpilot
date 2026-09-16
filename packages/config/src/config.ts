@@ -31,6 +31,11 @@ const configSchema = z.object({
   // Frontend (used for CORS)
   FRONTEND_URL: z.string().url().default('http://localhost:3000'),
 
+  // GitHub OAuth
+  GITHUB_CLIENT_ID: z.string().default(''),
+  GITHUB_CLIENT_SECRET: z.string().default(''),
+  GITHUB_CALLBACK_URL: z.string().url().default('http://localhost:3001/api/auth/github/callback'),
+
   // NextAuth (if used)
   NEXTAUTH_URL: z.string().url().default('http://localhost:3000'),
   NEXTAUTH_SECRET: z.string().default('jobpilot-dev-nextauth-secret-key-123'),

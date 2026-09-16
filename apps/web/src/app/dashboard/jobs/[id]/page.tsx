@@ -90,7 +90,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
             </div>
 
             <Link
-              href={`/dashboard/jobs/${id}/apply`}
+              href={`/dashboard/jobs/${String(id)}/apply`}
               className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition hover:bg-blue-700"
             >
               <Send className="h-4 w-4" />

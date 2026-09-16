@@ -40,7 +40,10 @@ export async function getApplyPageData(jobId: string): Promise<ApplyPageData | n
     fetch(`${API_BASE_URL}/api/cover-letters`, { headers, cache: 'no-store' }),
   ]);
 
-  if (!jobRes.ok) return null;
+  if (!jobRes.ok) {
+    console.error('[apply] Job fetch failed', { jobId, status: jobRes.status, body: await jobRes.text() });
+    return null;
+  }
 
   const job = ((await jobRes.json()) as { job: Job }).job;
 

@@ -1,7 +1,9 @@
 import { AuthForm } from '@/components/auth-form';
+import { AlternateAuthMethods } from '@/components/alternate-auth-methods';
 import { ActiveSessionBanner } from '@/components/active-session-banner';
 import { loginAction } from '@/app/actions';
 import { getCurrentUser } from '@/lib/auth';
+import { API_BASE_URL } from '@/lib/api';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Sparkles, Zap } from 'lucide-react';
 
@@ -95,6 +97,8 @@ export default async function LoginPage() {
               },
             ]}
           />
+
+          <AlternateAuthMethods role="CANDIDATE" apiBaseUrl={API_BASE_URL} />
         </div>
       </div>
     </main>

@@ -22,6 +22,17 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+// Authentification sans mot de passe (code a usage unique envoye par email)
+export const otpRequestSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  role: userRoleSchema.optional(),
+});
+
+export const otpVerifySchema = z.object({
+  email: z.string().email('Invalid email address'),
+  code: z.string().length(6, 'Le code doit contenir 6 chiffres'),
+});
+
 // Profile validation schemas
 export const profileSchema = z.object({
   title: z.string().optional(),

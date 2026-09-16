@@ -92,7 +92,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 
   // Same generic error whether the email or the password is wrong,
   // so we don't reveal which accounts exist.
-  if (!user) {
+  if (!user || !user.password) {
     res.status(401).json({ error: 'Invalid email or password' });
     return;
   }

@@ -63,7 +63,8 @@ enum ApplicationActivityType {
 model User {
   id                    String                @id @default(uuid())
   email                 String                @unique
-  password              String // hashed password
+  password              String? // hashed password ; absent pour les comptes OTP/GitHub uniquement
+  githubId              String?               @unique
   firstName             String
   lastName              String
   phone                 String?
@@ -354,4 +355,17 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@index([userId], name: "notification_userid_idx")
+}
+
+// Codes de connexion temporaires envoyes par email (authentification sans mot de passe).
+model OtpCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String // hash bcrypt du code a 6 chiffres
+  role      UserRole @default(CANDIDATE) // role a utiliser si un nouveau compte doit etre cree
+  consumed  Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email], name: "otpcode_email_idx")
 }
