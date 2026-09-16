@@ -155,7 +155,7 @@ export function JobManager({ jobs, userRole, preferences, total }: JobManagerPro
 
   return (
     <div className="space-y-5">
-      <section className="grid gap-3 sm:grid-cols-3">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {[
           { label: isRecruiter ? 'Offres publiées' : 'Opportunités', value: isRecruiter ? activeRecruiterJobs.length : total, tone: 'blue' },
           { label: isRecruiter ? 'Candidatures reçues' : 'Correspondances fortes', value: isRecruiter ? activeRecruiterJobs.reduce((sum, job) => sum + (job.applicationsCount ?? 0), 0) : matchingJobs, tone: 'violet' },

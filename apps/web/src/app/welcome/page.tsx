@@ -190,7 +190,7 @@ export default function WelcomePage() {
           </div>
 
           {/* Social Proof metrics */}
-          <div className="mt-14 grid grid-cols-2 gap-4 rounded-2xl border border-slate-200/80 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:grid-cols-4">
+          <div className="mt-14 grid grid-cols-1 gap-4 rounded-2xl border border-slate-200/80 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <p className="text-3xl font-extrabold text-blue-600">+85%</p>
               <p className="mt-1 text-xs font-medium text-slate-500">Taux de pertinence des offres</p>
@@ -211,7 +211,7 @@ export default function WelcomePage() {
         </div>
 
         {/* Interactive Mockup / Visual Preview */}
-        <div id="preview" className="mx-auto mt-16 max-w-5xl px-6">
+        <div id="preview" className="mx-auto mt-16 max-w-5xl px-4 sm:px-6">
           <div className="rounded-3xl border border-slate-200 bg-slate-900 p-3 shadow-2xl ring-1 ring-slate-900/10">
             <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-3 text-xs text-slate-400">
               <div className="flex gap-1.5">
@@ -222,7 +222,7 @@ export default function WelcomePage() {
               <span className="ml-2 font-mono text-slate-400">jobpilot.app/dashboard/preview</span>
             </div>
 
-            <div className="grid gap-6 p-6 md:grid-cols-3 bg-slate-950 text-white rounded-b-2xl">
+            <div className="grid gap-6 p-6 sm:grid-cols-1 lg:grid-cols-3 bg-slate-950 text-white rounded-b-2xl">
               {/* Card 1: Job Detected */}
               <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5">
                 <div className="flex items-center justify-between text-xs text-slate-400">
@@ -308,7 +308,7 @@ export default function WelcomePage() {
             </p>
           </div>
 
-          <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
@@ -346,7 +346,7 @@ export default function WelcomePage() {
             </p>
           </div>
 
-          <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-14 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {steps.map((item) => {
               const Icon = item.icon;
               return (

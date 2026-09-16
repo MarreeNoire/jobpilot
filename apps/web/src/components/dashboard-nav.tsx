@@ -44,7 +44,7 @@ export function DashboardNav({ role = 'CANDIDATE' }: { role?: UserRole }) {
   const items = role === 'ADMIN' ? adminItems : role === 'RECRUITER' ? recruiterItems : candidateItems;
 
   return (
-    <nav className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-sm">
+    <nav className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 py-1.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:rounded-2xl sm:border sm:border-slate-200/80 sm:bg-white sm:p-1.5 sm:shadow-sm [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive =
@@ -56,13 +56,13 @@ export function DashboardNav({ role = 'CANDIDATE' }: { role?: UserRole }) {
           <Link
             key={item.href}
             href={item.href}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
+            className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs font-medium transition-all sm:border-0 sm:px-4 sm:py-2.5 sm:text-sm ${
               isActive
-                ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
+                ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25 border-blue-600'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
-            <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+            <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
             <span>{item.label}</span>
           </Link>
         );

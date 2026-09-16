@@ -26,7 +26,7 @@ export async function DashboardHeader({ user }: DashboardHeaderProps) {
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xl font-bold tracking-tight text-white">JobPilot</span>
               <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs font-semibold text-white border border-white/20">
                 {roleLabel}
@@ -38,15 +38,15 @@ export async function DashboardHeader({ user }: DashboardHeaderProps) {
       </div>
 
       <div className="flex items-center justify-between gap-4 border-t border-white/15 pt-3 sm:border-0 sm:pt-0">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-2 ring-white/20">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-2 ring-white/20">
             {initials || <UserIcon className="h-4 w-4" />}
           </div>
-          <div className="text-left">
-            <p className="text-sm font-semibold text-white leading-tight">
+          <div className="min-w-0 text-left">
+            <p className="truncate text-sm font-semibold text-white leading-tight">
               {user.firstName} {user.lastName}
             </p>
-            <p className="text-xs text-blue-50/70 leading-tight">{user.email}</p>
+            <p className="truncate text-xs text-blue-50/70 leading-tight">{user.email}</p>
           </div>
         </div>
 
